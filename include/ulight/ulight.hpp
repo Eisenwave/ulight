@@ -17,6 +17,7 @@ using Underlying = unsigned char;
 
 /// See `ulight_lang`.
 enum struct Lang : Underlying {
+    xml = ULIGHT_LANG_XML,
     cpp = ULIGHT_LANG_CPP,
     html = ULIGHT_LANG_HTML,
     lua = ULIGHT_LANG_LUA,

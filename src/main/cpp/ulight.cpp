@@ -99,6 +99,8 @@ constexpr ulight_lang_entry ulight_lang_list[] {
     // make_lang_entry( u8"ts", ULIGHT_LANG_typescript ),
     // make_lang_entry( u8"tsx", ULIGHT_LANG_typescript ),
     // make_lang_entry( u8"typescript", ULIGHT_LANG_typescript ),
+    make_lang_entry("xml", ULIGHT_LANG_XML),
+    make_lang_entry("XML", ULIGHT_LANG_XML),
 };
 
 ULIGHT_EXPORT
@@ -111,6 +113,7 @@ constexpr ulight_string_view ulight_lang_display_names[ULIGHT_LANG_COUNT] {
     make_sv("C++"),
     make_sv("Lua"),
     make_sv("HTML"),
+    make_sv("XML"),
 };
 // clang-format on
 

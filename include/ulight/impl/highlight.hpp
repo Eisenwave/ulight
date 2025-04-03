@@ -46,6 +46,12 @@ bool highlight_html(
     std::pmr::memory_resource* memory,
     const Highlight_Options& options = {}
 );
+bool highlight_xml(
+    Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
 
 inline Status highlight(
     Non_Owning_Buffer<Token>& out,
@@ -71,6 +77,8 @@ inline Status highlight(
         return to_result(highlight_lua(out, source, memory, options));
     case Lang::html: //
         return to_result(highlight_html(out, source, memory, options));
+    case Lang::xml:
+        return to_result(highlight_xml(out, source, memory, options));
     default: //
         return Status::bad_lang;
     }
