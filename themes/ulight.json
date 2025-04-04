@@ -1,0 +1,63 @@
+{
+    "meta": {
+        "name": "ulight",
+        "author": "ulight",
+        "url": "https://github.com/Eisenwave/ulight"
+    },
+    "light": {
+        "err": "#ff0000",
+        "cmt": {
+            "color": "#777777",
+            "font-style": "italic"
+        },
+        "cmt-delim": {
+            "font-style": "normal"
+        },
+        "null": "#c80032",
+        "bool": "#c80032",
+        "kw": "#c80032",
+        "this": "#c80032",
+        "mk-tag": "#c80032",
+        "str": "#367c2a",
+        "num": "#367c2a",
+        "val": "#367c2a",
+        "mac": "#3a2986",
+        "id": "#000000",
+        "id-var": "#5c477e",
+        "id-attr": "#5c477e",
+        "mk-attr": "#5c477e",
+        "id-fun": "#853e7a",
+        "id-type": "#0050c8",
+        "attr": "#966c1c",
+        "sym": "#000000",
+        "sym-punc": "#646464"
+    },
+    "dark": {
+        "err": "#ff0000",
+        "cmt": {
+            "color": "#777777",
+            "font-style": "italic"
+        },
+        "cmt-delim": {
+            "font-style": "normal"
+        },
+        "null": "#ff5a82",
+        "bool": "#ff5a82",
+        "kw": "#ff5a82",
+        "this": "#ff5a82",
+        "mk-tag": "#ff5a82",
+        "str": "#98d48e",
+        "num": "#98d48e",
+        "val": "#98d48e",
+        "mac": "#b0a9cf",
+        "id": "#cccccc",
+        "id-var": "#a4c4de",
+        "id-attr": "#a4c4de",
+        "mk-attr": "#a4c4de",
+        "id-fun": "#ffdc9c",
+        "id-type": "#4fb0ff",
+        "attr": "#ea91d4",
+        "sym": "#ffffff",
+        "sym-punc": "#a0a0a0"
+    }
+}
