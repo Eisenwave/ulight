@@ -63,116 +63,121 @@ constexpr Flag operator|(Flag x, Flag y) noexcept
     return Flag(Underlying(x) | Underlying(y));
 }
 
+// A table with the columns:
+//   - identifier (for enumerator names) (trailing underscores may be needed to avoid C++ keywords)
+//   - long string (same as identifier, but with hyphens and without trailing underscores)
+//   - short string (like long string, but with each part at most four characters long)
+//   - ulight_highlight_type value
+#define ULIGHT_HIGHLIGHT_TYPE_ENUM_DATA(F)                                                         \
+    F(error, "error", "err", ULIGHT_HL_ERROR)                                                      \
+    F(comment, "comment", "cmt", ULIGHT_HL_COMMENT)                                                \
+    F(comment_delim, "comment-delim", "cmt_dlim", ULIGHT_HL_COMMENT_DELIM)                         \
+    F(value, "value", "val", ULIGHT_HL_VALUE)                                                      \
+    F(number, "number", "num", ULIGHT_HL_NUMBER)                                                   \
+    F(number_delim, "number-delim", "num_dlim", ULIGHT_HL_NUMBER_DELIM)                            \
+    F(number_decor, "number-decor", "num_deco", ULIGHT_HL_NUMBER_DECOR)                            \
+    F(string, "string", "str", ULIGHT_HL_STRING)                                                   \
+    F(string_delim, "string-delim", "str_dlim", ULIGHT_HL_STRING_DELIM)                            \
+    F(string_decor, "string-decor", "str_deco", ULIGHT_HL_STRING_DECOR)                            \
+    F(escape, "escape", "esc", ULIGHT_HL_ESCAPE)                                                   \
+    F(null, "null", "null", ULIGHT_HL_NULL)                                                        \
+    F(bool_, "bool", "bool", ULIGHT_HL_BOOL)                                                       \
+    F(this_, "this", "this", ULIGHT_HL_THIS)                                                       \
+    F(macro, "macro", "mac", ULIGHT_HL_MACRO)                                                      \
+    F(id, "id", "id", ULIGHT_HL_ID)                                                                \
+    F(id_decl, "id-decl", "id_decl", ULIGHT_HL_ID_DECL)                                            \
+    F(id_var, "id-var", "id_var", ULIGHT_HL_ID_VAR)                                                \
+    F(id_var_decl, "id-var-decl", "id_var_decl", ULIGHT_HL_ID_VAR_DECL)                            \
+    F(id_const, "id-const", "id_cons", ULIGHT_HL_ID_CONST)                                         \
+    F(id_const_decl, "id-const-decl", "id_cons_decl", ULIGHT_HL_ID_CONST_DECL)                     \
+    F(id_function, "id-function", "id_fun", ULIGHT_HL_ID_FUNCTION)                                 \
+    F(id_function_decl, "id-function-decl", "id_fun_decl", ULIGHT_HL_ID_FUNCTION_DECL)             \
+    F(id_type, "id-type", "id_type", ULIGHT_HL_ID_TYPE)                                            \
+    F(id_type_decl, "id-type-decl", "id_type_decl", ULIGHT_HL_ID_TYPE_DECL)                        \
+    F(id_module, "id-module", "id_mod", ULIGHT_HL_ID_MODULE)                                       \
+    F(id_module_decl, "id-module-decl", "id_mod_decl", ULIGHT_HL_ID_MODULE_DECL)                   \
+    F(id_label, "id-label", "id_labl", ULIGHT_HL_ID_LABEL)                                         \
+    F(id_label_decl, "id-label-decl", "id_labl_decl", ULIGHT_HL_ID_LABEL_DECL)                     \
+    F(keyword, "keyword", "kw", ULIGHT_HL_KEYWORD)                                                 \
+    F(keyword_control, "keyword-control", "kw_ctrl", ULIGHT_HL_KEYWORD_CONTROL)                    \
+    F(keyword_type, "keyword-type", "kw_type", ULIGHT_HL_KEYWORD_TYPE)                             \
+    F(keyword_op, "keyword-op", "kw_op", ULIGHT_HL_KEYWORD_OP)                                     \
+    F(attr, "attr", "attr", ULIGHT_HL_ATTR)                                                        \
+    F(attr_delim, "attr-delim", "attr_dlim", ULIGHT_HL_ATTR_DELIM)                                 \
+    F(diff_heading, "diff-heading", "diff_h", ULIGHT_HL_DIFF_HEADING)                              \
+    F(diff_common, "diff-common", "diff_eq", ULIGHT_HL_DIFF_COMMON)                                \
+    F(diff_hunk, "diff-hunk", "diff_hunk", ULIGHT_HL_DIFF_HUNK)                                    \
+    F(diff_deletion, "diff-deletion", "diff_del", ULIGHT_HL_DIFF_DELETION)                         \
+    F(diff_insertion, "diff-insertion", "diff_ins", ULIGHT_HL_DIFF_INSERTION)                      \
+    F(markup_tag, "markup-tag", "mk_tag", ULIGHT_HL_MARKUP_TAG)                                    \
+    F(markup_attr, "markup-attr", "mk_attr", ULIGHT_HL_MARKUP_ATTR)                                \
+    F(markup_deletion, "markup-deletion", "mk_del", ULIGHT_HL_MARKUP_DELETION)                     \
+    F(markup_insertion, "markup-insertion", "mk_ins", ULIGHT_HL_MARKUP_INSERTION)                  \
+    F(markup_emph, "markup-emph", "mk_emph", ULIGHT_HL_MARKUP_EMPH)                                \
+    F(markup_strong, "markup-strong", "mk_stro", ULIGHT_HL_MARKUP_STRONG)                          \
+    F(markup_emph_strong, "markup-emph-strong", "mk_emph_stro", ULIGHT_HL_MARKUP_EMPH_STRONG)      \
+    F(markup_underline, "markup-underline", "mk_ulin", ULIGHT_HL_MARKUP_UNDERLINE)                 \
+    F(markup_emph_underline, "markup-emph-underline", "mk_emph_ulin",                              \
+      ULIGHT_HL_MARKUP_EMPH_UNDERLINE)                                                             \
+    F(markup_strong_underline, "markup-strong-underline", "mk_stro_ulin",                          \
+      ULIGHT_HL_MARKUP_STRONG_UNDERLINE)                                                           \
+    F(markup_emph_strong_underline, "markup-emph-strong-underline", "mk_emph_stro_ulin",           \
+      ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE)                                                      \
+    F(markup_strikethrough, "markup-strikethrough", "mk_strk", ULIGHT_HL_MARKUP_STRIKETHROUGH)     \
+    F(markup_emph_strikethrough, "markup-emph-strikethrough", "mk_emph_strk",                      \
+      ULIGHT_HL_MARKUP_EMPH_STRIKETHROUGH)                                                         \
+    F(markup_strong_strikethrough, "markup-strong-strikethrough", "mk_stro_strk",                  \
+      ULIGHT_HL_MARKUP_STRONG_STRIKETHROUGH)                                                       \
+    F(markup_emph_strong_strikethrough, "markup-emph-strong-strikethrough", "mk_emph_stro_strk",   \
+      ULIGHT_HL_MARKUP_EMPH_STRONG_STRIKETHROUGH)                                                  \
+    F(markup_underline_strikethrough, "markup-underline-strikethrough", "mk_ulin_strk",            \
+      ULIGHT_HL_MARKUP_UNDERLINE_STRIKETHROUGH)                                                    \
+    F(markup_emph_underline_strikethrough, "markup-emph-underline-strikethrough",                  \
+      "mk_emph_ulin_strk", ULIGHT_HL_MARKUP_EMPH_UNDERLINE_STRIKETHROUGH)                          \
+    F(markup_strong_underline_strikethrough, "markup-strong-underline-strikethrough",              \
+      "mk_stro_ulin_strk", ULIGHT_HL_MARKUP_STRONG_UNDERLINE_STRIKETHROUGH)                        \
+    F(markup_emph_strong_underline_strikethrough, "markup-emph-strong-underline-strikethrough",    \
+      "mk_emph_stro_ulin_strk", ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE_STRIKETHROUGH)              \
+    F(sym, "sym", "sym", ULIGHT_HL_SYM)                                                            \
+    F(sym_punc, "sym-punc", "sym_punc", ULIGHT_HL_SYM_PUNC)                                        \
+    F(sym_parens, "sym-parens", "sym_par", ULIGHT_HL_SYM_PARENS)                                   \
+    F(sym_square, "sym-square", "sym_sqr", ULIGHT_HL_SYM_SQUARE)                                   \
+    F(sym_brace, "sym-brace", "sym_brac", ULIGHT_HL_SYM_BRACE)                                     \
+    F(sym_op, "sym-op", "sym_op", ULIGHT_HL_SYM_OP)
+
+// NOLINTNEXTLINE(bugprone-macro-parentheses)
+#define ULIGHT_HIGHLIGHT_TYPE_ENUMERATOR(id, long_str, short_str, initializer) id = initializer,
+#define ULIGHT_HIGHLIGHT_TYPE_LONG_STRING_CASE(id, long_str, short_str, initializer)               \
+    case id: return long_str;
+#define ULIGHT_HIGHLIGHT_TYPE_SHORT_STRING_CASE(id, long_str, short_str, initializer)              \
+    case id: return short_str;
+
 /// See `ulight_highlight_type`.
 enum struct Highlight_Type : Underlying {
-    error = ULIGHT_HL_ERROR,
-    comment = ULIGHT_HL_COMMENT,
-    comment_delimiter = ULIGHT_HL_COMMENT_DELIM,
-    value = ULIGHT_HL_VALUE,
-    number = ULIGHT_HL_NUMBER,
-    number_delim = ULIGHT_HL_NUMBER_DELIM,
-    number_decor = ULIGHT_HL_NUMBER_DECOR,
-    string = ULIGHT_HL_STRING,
-    string_delim = ULIGHT_HL_STRING_DELIM,
-    string_decor = ULIGHT_HL_STRING_DECOR,
-    escape = ULIGHT_HL_ESCAPE,
-    null = ULIGHT_HL_NULL,
-    bool_ = ULIGHT_HL_BOOL,
-    this_ = ULIGHT_HL_THIS,
-    macro = ULIGHT_HL_MACRO,
-    id = ULIGHT_HL_ID,
-    id_decl = ULIGHT_HL_ID_DECL,
-    id_use = ULIGHT_HL_ID_USE,
-    id_var_decl = ULIGHT_HL_ID_VAR_DECL,
-    id_var_use = ULIGHT_HL_ID_VAR_USE,
-    id_const_decl = ULIGHT_HL_ID_CONST_DECL,
-    id_const_use = ULIGHT_HL_ID_CONST_USE,
-    id_function_decl = ULIGHT_HL_ID_FUNCTION_DECL,
-    id_function_use = ULIGHT_HL_ID_FUNCTION_USE,
-    id_type_decl = ULIGHT_HL_ID_TYPE_DECL,
-    id_type_use = ULIGHT_HL_ID_TYPE_USE,
-    id_module_decl = ULIGHT_HL_ID_MODULE_DECL,
-    id_module_use = ULIGHT_HL_ID_MODULE_USE,
-    keyword = ULIGHT_HL_KEYWORD,
-    keyword_control = ULIGHT_HL_KEYWORD_CONTROL,
-    keyword_type = ULIGHT_HL_KEYWORD_TYPE,
-    attr = ULIGHT_HL_ATTR,
-    attr_delim = ULIGHT_HL_ATTR_DELIM,
-    diff_heading = ULIGHT_HL_DIFF_HEADING,
-    diff_common = ULIGHT_HL_DIFF_COMMON,
-    diff_hunk = ULIGHT_HL_DIFF_HUNK,
-    diff_deletion = ULIGHT_HL_DIFF_DELETION,
-    diff_insertion = ULIGHT_HL_DIFF_INSERTION,
-    markup_tag = ULIGHT_HL_MARKUP_TAG,
-    markup_attr = ULIGHT_HL_MARKUP_ATTR,
-    sym = ULIGHT_HL_SYM,
-    sym_punc = ULIGHT_HL_SYM_PUNC,
-    sym_parens = ULIGHT_HL_SYM_PARENS,
-    sym_square = ULIGHT_HL_SYM_SQUARE,
-    sym_brace = ULIGHT_HL_SYM_BRACE,
-    sym_op = ULIGHT_HL_SYM_OP
+    ULIGHT_HIGHLIGHT_TYPE_ENUM_DATA(ULIGHT_HIGHLIGHT_TYPE_ENUMERATOR)
 };
 
 [[nodiscard]]
-constexpr std::string_view ulight_highlight_type_id(Highlight_Type type) noexcept
+constexpr std::string_view highlight_type_long_string(Highlight_Type type) noexcept
 {
-    // Design note:
-    // All names should be underscore-separated blocks of up to four characters.
-    // The abbreviations should always be distinct if they abbreviate different words.
-    // For example, "del" stands for "deletion", and "dlim" stands for "delimiter".
     switch (type) {
         using enum Highlight_Type;
-    case error: return "err";
-    case comment: return "cmt";
-    case comment_delimiter: return "cmt_dlim";
-    case value: return "val";
-    case number: return "num";
-    case number_delim: return "num_dlim";
-    case number_decor: return "num_deco";
-    case string: return "str";
-    case string_delim: return "str_dlim";
-    case string_decor: return "str_deco";
-    case escape: return "esc";
-    case null: return "null";
-    case bool_: return "bool";
-    case this_: return "this";
-    case macro: return "mac";
-    case id: return "id";
-    case id_decl: return "id_dcl";
-    case id_use: return "id_use";
-    case id_var_decl: return "id_var_dcl";
-    case id_var_use: return "id_var_use";
-    case id_const_decl: return "id_cons_dcl";
-    case id_const_use: return "id_cons_use";
-    case id_function_decl: return "id_fun_dcl";
-    case id_function_use: return "id_fun_use";
-    case id_type_decl: return "id_type_dcl";
-    case id_type_use: return "id_type_use";
-    case id_module_decl: return "id_mod_dcl";
-    case id_module_use: return "id_mod_use";
-    case keyword: return "kw";
-    case keyword_control: return "kw_ctrl";
-    case keyword_type: return "kw_type";
-    case attr: return "attr";
-    case attr_delim: return "attr_dlim";
-    case diff_heading: return "df_h";
-    case diff_common: return "df_eq";
-    case diff_hunk: return "df_hunk";
-    case diff_deletion: return "df_del";
-    case diff_insertion: return "df_ins";
-    case markup_tag: return "mk_tag";
-    case markup_attr: return "mk_attr";
-    case sym: return "sym";
-    case sym_punc: return "sym_punc";
-    case sym_parens: return "sym_par";
-    case sym_square: return "sym_sqr";
-    case sym_brace: return "sym_brac";
-    case sym_op: return "sym_op";
+        ULIGHT_HIGHLIGHT_TYPE_ENUM_DATA(ULIGHT_HIGHLIGHT_TYPE_LONG_STRING_CASE)
     }
     return {};
 }
 
 [[nodiscard]]
+constexpr std::string_view highlight_type_short_string(Highlight_Type type) noexcept
+{
+    switch (type) {
+        using enum Highlight_Type;
+        ULIGHT_HIGHLIGHT_TYPE_ENUM_DATA(ULIGHT_HIGHLIGHT_TYPE_SHORT_STRING_CASE)
+    }
+    return {};
+}
+
+[[deprecated("Use highlight_type_long_string or highlight_type_short_string")]] [[nodiscard]]
 inline std::string_view highlight_type_id(Highlight_Type type) noexcept
 {
     const ulight_string_view result = ulight_highlight_type_id(ulight_highlight_type(type));
