@@ -146,7 +146,8 @@ ulight_lang ulight_get_lang(const char* name, size_t name_length) noexcept
 ULIGHT_EXPORT
 ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) noexcept
 {
-    const std::string_view result = ulight::ulight_highlight_type_id(ulight::Highlight_Type(type));
+    const std::string_view result
+        = ulight::highlight_type_short_string(ulight::Highlight_Type(type));
     return { result.data(), result.size() };
 }
 
@@ -224,6 +225,7 @@ ulight_status error(ulight_state* state, ulight_status status, std::u8string_vie
 } // namespace
 
 ULIGHT_EXPORT
+// NOLINTNEXTLINE(bugprone-exception-escape)
 ulight_status ulight_source_to_tokens(ulight_state* state) noexcept
 {
     if (state->source == nullptr && state->source_length != 0) {

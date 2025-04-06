@@ -639,7 +639,7 @@ void highlight_c_cpp( //
             continue;
         }
         if (const std::size_t line_comment_length = match_line_comment(remainder)) {
-            emit(index, 2, Highlight_Type::comment_delimiter);
+            emit(index, 2, Highlight_Type::comment_delim);
             emit(index + 2, line_comment_length - 2, Highlight_Type::comment);
             fresh_line = true;
             index += line_comment_length;
@@ -647,10 +647,10 @@ void highlight_c_cpp( //
         }
         if (const Comment_Result block_comment = match_block_comment(remainder)) {
             const std::size_t terminator_length = 2 * std::size_t(block_comment.is_terminated);
-            emit(index, 2, Highlight_Type::comment_delimiter); // /*
+            emit(index, 2, Highlight_Type::comment_delim); // /*
             emit(index + 2, block_comment.length - 2 - terminator_length, Highlight_Type::comment);
             if (block_comment.is_terminated) {
-                emit(index + block_comment.length - 2, 2, Highlight_Type::comment_delimiter); // */
+                emit(index + block_comment.length - 2, 2, Highlight_Type::comment_delim); // */
             }
             index += block_comment.length;
             continue;

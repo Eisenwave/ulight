@@ -704,7 +704,7 @@ void highlight_mmml( //
             case push_block: {
                 ++target;
                 if (in_comment++ <= 1) {
-                    emit(comment_delimiter_length, Highlight_Type::comment_delimiter);
+                    emit(comment_delimiter_length, Highlight_Type::comment_delim);
                 }
                 break;
             }
@@ -713,7 +713,7 @@ void highlight_mmml( //
                     if (comment_content_length != 0) {
                         emit(comment_content_length, Highlight_Type::comment);
                     }
-                    emit(1, Highlight_Type::comment_delimiter);
+                    emit(1, Highlight_Type::comment_delim);
                 }
                 else {
                     ++comment_content_length;

@@ -567,7 +567,7 @@ bool highlight_lua(
 
         // Line comments - Lua treats each line separately, no backslash continuation
         if (const std::size_t line_comment_length = lua::match_line_comment(remainder)) {
-            emit(index, 2, Highlight_Type::comment_delimiter);
+            emit(index, 2, Highlight_Type::comment_delim);
             emit(index + 2, line_comment_length - 2, Highlight_Type::comment);
             index += line_comment_length;
             continue;
@@ -589,7 +589,7 @@ bool highlight_lua(
                 ? (remainder[2] == u8'[' && remainder[3] != u8'[' ? 2 + (prefix_length - 4) : 2)
                 : 0;
 
-            emit(index, prefix_length, Highlight_Type::comment_delimiter);
+            emit(index, prefix_length, Highlight_Type::comment_delim);
             emit(
                 index + prefix_length, block_comment.length - prefix_length - closing_delim_length,
                 Highlight_Type::comment
@@ -598,7 +598,7 @@ bool highlight_lua(
             if (block_comment.is_terminated) {
                 emit(
                     index + block_comment.length - closing_delim_length, closing_delim_length,
-                    Highlight_Type::comment_delimiter
+                    Highlight_Type::comment_delim
                 );
             }
 
