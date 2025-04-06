@@ -194,43 +194,43 @@ typedef enum ulight_highlight_type {
     ULIGHT_HL_ID = 0x40,
     /// @brief In coding languages,
     /// an identifier in a declaration.
-    ULIGHT_HL_ID_DECL = 0x42,
-    /// @brief In coding languages,
-    /// an identifier in use of a construct.
-    ULIGHT_HL_ID_USE = 0x43,
+    ULIGHT_HL_ID_DECL = 0x41,
+    /// @brief In coding languages, a variable identifier.
+    ULIGHT_HL_ID_VAR = 0x42,
     /// @brief In coding languages,
     /// an identifier in a variable declaration, like `int x;`.
-    ULIGHT_HL_ID_VAR_DECL = 0x44,
-    /// @brief In coding languages,
-    /// an identifier when a variable is used.
-    ULIGHT_HL_ID_VAR_USE = 0x45,
+    ULIGHT_HL_ID_VAR_DECL = 0x43,
+    /// @brief In coding languages, a constant identifier.
+    ULIGHT_HL_ID_CONST = 0x44,
     /// @brief In coding languages,
     /// an identifier in a constant declaration,
     /// like `const int x;`.
-    ULIGHT_HL_ID_CONST_DECL = 0x46,
-    /// @brief In coding languages,
-    /// an identifier in the use of a constant.
-    ULIGHT_HL_ID_CONST_USE = 0x47,
+    ULIGHT_HL_ID_CONST_DECL = 0x45,
+    /// @brief In coding languages, a function identifier, like `f()`.
+    ULIGHT_HL_ID_FUNCTION = 0x46,
     /// @brief In coding languages,
     /// an identifier in a function declaration,
     /// like `void f()`.
-    ULIGHT_HL_ID_FUNCTION_DECL = 0x48,
-    /// @brief In coding languages,
-    /// an identifier in the use of a function, like `f()`.
-    ULIGHT_HL_ID_FUNCTION_USE = 0x49,
+    ULIGHT_HL_ID_FUNCTION_DECL = 0x47,
+    /// @brief In coding languages, a type (alias) identifier.
+    ULIGHT_HL_ID_TYPE = 0x4a,
     /// @brief In coding languages,
     /// an identifier in the declaration of a type or type alias,
     /// like `class C`.
-    ULIGHT_HL_ID_TYPE_DECL = 0x4a,
+    ULIGHT_HL_ID_TYPE_DECL = 0x4b,
     /// @brief In coding languages,
-    /// an identifier in the use of a type or type alias.
-    ULIGHT_HL_ID_TYPE_USE = 0x4b,
+    /// an identifier in of a module, namespace, or other such construct.
+    ULIGHT_HL_ID_MODULE = 0x4c,
     /// @brief In coding languages,
     /// an identifier in the declaration of a module, namespace, or other such construct.
-    ULIGHT_HL_ID_MODULE_DECL = 0x4c,
+    ULIGHT_HL_ID_MODULE_DECL = 0x4d,
+    /// @brief In coding language, a label identifier,
+    /// like in `goto label`.
+    ULIGHT_HL_ID_LABEL = 0x4e,
     /// @brief In coding languages,
-    /// an identifier in the use of a module, namespace, or other such construct.
-    ULIGHT_HL_ID_MODULE_USE = 0x4d,
+    /// an identifier in the declaration of a label,
+    /// like in `label: while (true)`.
+    ULIGHT_HL_ID_LABEL_DECL = 0x4f,
 
     /// @brief In coding languages, a keyword, like `import`.
     ULIGHT_HL_KEYWORD = 0x50,
@@ -238,6 +238,8 @@ typedef enum ulight_highlight_type {
     ULIGHT_HL_KEYWORD_CONTROL = 0x51,
     /// @brief In coding languages, a keyword that specifies a type, like `int`.
     ULIGHT_HL_KEYWORD_TYPE = 0x52,
+    /// @brief In coding languages, a keyword that represents an operator, like `and`.
+    ULIGHT_HL_KEYWORD_OP = 0x53,
 
     /// @brief In languages with attribute syntax, the attribute content
     ULIGHT_HL_ATTR = 0x60,
@@ -258,13 +260,58 @@ typedef enum ulight_highlight_type {
     /// @brief In unidiff, an insertion line.
     ULIGHT_HL_DIFF_INSERTION = 0x84,
 
-    // 0x90..0x9f Markup-specific highlighting
+    // 0x90..0xaf Markup-specific highlighting
     // -------------------------------------------------------------------------
 
     /// @brief In Markup languages, a tag, like the name of `html` in `<html>`.
     ULIGHT_HL_MARKUP_TAG = 0x90,
     /// @brief In Markup languages, the name of an attribute.
     ULIGHT_HL_MARKUP_ATTR = 0x91,
+
+    /// @brief In Markup languages, deleted text.
+    ULIGHT_HL_MARKUP_DELETION = 0x98,
+    /// @brief In Markup languages, inserted text.
+    ULIGHT_HL_MARKUP_INSERTION = 0x99,
+
+    // Note that the following 15 values use a bitmask,
+    // where the first 4 bits are always 1010, followed by:
+    //  - 1-bit if emphasized
+    //  - 2-bit if strong
+    //  - 4-bit if underlined
+    //  - 8-bit if strikethrough
+
+    /// @brief DO NOT EMIT. Helper base value only.
+    ULIGHT_HL_MARKUP_TEXT = 0xa0,
+    /// @brief In Markup languages, emphasized text.
+    ULIGHT_HL_MARKUP_EMPH = 0xa1,
+    /// @brief In Markup languages, strong text.
+    ULIGHT_HL_MARKUP_STRONG = 0xa2,
+    /// @brief In Markup languages, emphasized, strong text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG = 0xa3,
+    /// @brief In Markup languages, underlined text.
+    ULIGHT_HL_MARKUP_UNDERLINE = 0xa4,
+    /// @brief In Markup languages, emphasized, underlined text.
+    ULIGHT_HL_MARKUP_EMPH_UNDERLINE = 0xa5,
+    /// @brief In Markup languages, strong, underlined text.
+    ULIGHT_HL_MARKUP_STRONG_UNDERLINE = 0xa6,
+    /// @brief In Markup languages, strong, underlined text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE = 0xa7,
+    /// @brief In Markup languages, strikethrough text.
+    ULIGHT_HL_MARKUP_STRIKETHROUGH = 0xa8,
+    /// @brief In Markup languages, emphasized, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRIKETHROUGH = 0xa9,
+    /// @brief In Markup languages, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_STRONG_STRIKETHROUGH = 0xaa,
+    /// @brief In Markup languages, emphasized, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_STRIKETHROUGH = 0xab,
+    /// @brief In Markup languages, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_UNDERLINE_STRIKETHROUGH = 0xac,
+    /// @brief In Markup languages, emphasized, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_UNDERLINE_STRIKETHROUGH = 0xad,
+    /// @brief In Markup languages, underlined, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_STRONG_UNDERLINE_STRIKETHROUGH = 0xae,
+    /// @brief In Markup languages, emphasized, strong, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE_STRIKETHROUGH = 0xaf,
 
     // 0xc0..0xcf Symbols with special meaning
     // -------------------------------------------------------------------------
