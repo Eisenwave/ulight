@@ -43,12 +43,16 @@ h1 {
     user-select: none;
 }
 
-#language-id {
+#theme-picker {
     margin-left: auto;
-    margin-right: 2em;
 }
 
-#language-id,
+header>select {
+    margin-right: 2em;
+    min-width: 8em;
+}
+
+header>select,
 #split-buttons {
     height: 2em;
 }
@@ -119,7 +123,6 @@ textarea,
     box-sizing: border-box;
     margin: 0;
 
-    color: inherit;
     font-size: 11pt;
 }
 
@@ -134,20 +137,16 @@ textarea,
     overflow: hidden;
 }
 
-#code-input-container,
-#output-container {
-    overflow: auto;
-}
+.ulight-code-block {
+    display: grid;
+    grid-template-columns: auto 1fr;
 
-#output-container,
-#code-input-container {
+    overflow: auto;
+
     font-family: 'JetBrains Mono';
     font-variant-ligatures: no-contextual;
     font-weight: normal;
-}
 
-#code-input-container,
-#output-container {
     background: var(--deep-background);
     border: 0.75em solid var(--deep-background);
     border-radius: 0.5em;
@@ -155,12 +154,6 @@ textarea,
 
 #output {
     white-space: pre;
-}
-
-#code-input-container,
-#output-container {
-    display: grid;
-    grid-template-columns: auto 1fr;
 }
 
 textarea,
@@ -182,7 +175,8 @@ textarea,
     min-width: 3ch;
     overflow: hidden;
 
-    background: var(--deep-background);
+    color: inherit;
+    background: inherit;
 
     user-select: none;
     text-align: right;

@@ -11,7 +11,7 @@
     :root {
         --text-rgb: 231, 231, 231;
         --text: rgb(var(--text-rgb));
-        --background: rgb(32, 32, 32);
+        --background: rgb(40, 40, 40);
         --deep-background: rgb(24, 24, 24);
     }
 

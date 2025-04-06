@@ -1,13 +1,18 @@
 export const container = document.getElementById('container');
+export const codeInputContainer = document.getElementById('code-input-container');
 export const codeInput = document.getElementById('code-input');
 export const codeInputLayers = document.getElementById('code-input-layers');
+export const outputContainer = document.getElementById('output-container');
+export const output = document.getElementById('output');
 export const languageIdSelect = document.getElementById('language-id');
+export const themePicker = document.getElementById('theme-picker');
 
 export const editorFractionLimit = 0.1;
 export const editorFractionItem = 'editorFraction';
 export const editorIsVerticalItem = 'editorIsVertical';
 export const editorContentsItem = 'editorContents';
 export const languageIdIndexItem = 'languageId';
+export const themeItem = 'theme';
 
 let isVertical = false;
 
@@ -77,6 +82,15 @@ export function setLanguageId(id, persist = false) {
     }
 }
 
+export function setTheme(theme, persist = false) {
+    themePicker.value = theme;
+    codeInputContainer.setAttribute('data-ulight-theme', theme);
+    outputContainer.setAttribute('data-ulight-theme', theme);
+    if (persist) {
+        localStorage.setItem(themeItem, theme);
+    }
+}
+
 const initialFraction = localStorage.getItem(editorFractionItem);
 if (initialFraction !== null) {
     resizeContainerToFraction(Number(initialFraction), false);
@@ -95,4 +109,9 @@ if (initialContents !== null) {
 const initialLanguageId = localStorage.getItem(languageIdIndexItem);
 if (initialLanguageId !== null) {
     setLanguageId(Number(initialLanguageId), false);
+}
+
+const initialTheme = localStorage.getItem(themeItem);
+if (initialTheme !== null) {
+    setTheme(initialTheme, false);
 }

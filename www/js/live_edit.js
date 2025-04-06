@@ -9,7 +9,9 @@ import {
     setEditorVertical,
     languageIdSelect,
     setLanguageId,
-    getLanguageId
+    getLanguageId,
+    setTheme,
+    themePicker
 } from "./live_edit_core.js";
 
 import {
@@ -254,6 +256,7 @@ const wasm = await loadWasm();
 codeInput.addEventListener('input', () => onCodeInput(true));
 languageIdSelect.addEventListener('change', () => onCodeInput(true));
 languageIdSelect.addEventListener('input', () => setLanguageId(languageIdSelect.value, true));
+themePicker.addEventListener('input', () => setTheme(themePicker.value, true));
 
 setLanguageOptions();
 onCodeInput(false);
