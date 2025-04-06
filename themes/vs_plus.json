@@ -1,0 +1,103 @@
+{
+    "meta": {
+        "name": "Visual Studio Plus/Modern",
+        "short_name": "VS Plus/Modern",
+        "author": "Microsoft",
+        "url": "https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_plus.json",
+        "license": "https://github.com/microsoft/vscode/blob/main/LICENSE.txt"
+    },
+    "dark": {
+        "background": "#1e1e1e",
+        "foreground": "#d4d4d4",
+        "error": "#f44747",
+        "comment": "#6a9955",
+        "value": "#b5cea8",
+        "number": "#b5cea8",
+        "string": "#ce9178",
+        "escape": "#d7ba7d",
+        "macro": "#569cd6",
+        "id-var": "#9cdcfe",
+        "id-const": "#4fc1ff",
+        "id-type": "#4ec9b0",
+        "id-label": "#c8c8c8",
+        "keyword": "#569cd6",
+        "keyword-control": "#c586c0",
+        "keyword-op": "#d4d4d4",
+        "diff-deletion": "#ce9178",
+        "diff-insertion": "#b5cea8",
+        "markup-tag": "#d7ba7d",
+        "markup-attr": "#9cdcfe",
+        "markup-deletion": "#ce9178",
+        "markup-insertion": "#b5cea8",
+        "markup-emph": {
+            "font-style": "italic"
+        },
+        "markup-strong": {
+            "color": "#569cd6",
+            "font-weight": "bold"
+        },
+        "markup-emph-strong": {
+            "color": "#569cd6",
+            "font-style": "italic",
+            "font-weight": "bold"
+        },
+        "markup-underline": {
+            "text-decoration": "underline"
+        },
+        "markup-emph-underline": {
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strong-underline": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "text-decoration": "underline"
+        },
+        "markup-emph-strong-underline": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strikethrough": {
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-strong-strikethrough": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strong-strikethrough": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-underline-strikethrough": {
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-underline-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "markup-strong-underline-strikethrough": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-strong-underline-strikethrough": {
+            "color": "#569cd6",
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "sym": "d4d4d4",
+        "sym-parens": "#ffd700",
+        "sym-square": "#ffd700",
+        "sym-brace": "#ffd700"
+    }
+}
