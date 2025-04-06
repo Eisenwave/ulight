@@ -5,59 +5,193 @@
         "url": "https://github.com/Eisenwave/ulight"
     },
     "light": {
-        "err": "#ff0000",
-        "cmt": {
+        "background": "#f0f0f0",
+        "foreground": "#000000",
+        "error": "#ff0000",
+        "comment": {
             "color": "#777777",
             "font-style": "italic"
         },
-        "cmt-delim": {
+        "comment-delim": {
             "font-style": "normal"
         },
         "null": "#c80032",
         "bool": "#c80032",
-        "kw": "#c80032",
+        "keyword": "#c80032",
         "this": "#c80032",
-        "mk-tag": "#c80032",
-        "str": "#367c2a",
-        "num": "#367c2a",
-        "val": "#367c2a",
-        "mac": "#3a2986",
+        "string": "#367c2a",
+        "number": "#367c2a",
+        "value": "#367c2a",
+        "macro": "#3a2986",
         "id": "#000000",
         "id-var": "#5c477e",
-        "id-attr": "#5c477e",
-        "mk-attr": "#5c477e",
-        "id-fun": "#853e7a",
+        "id-function": "#853e7a",
         "id-type": "#0050c8",
         "attr": "#966c1c",
         "sym": "#000000",
-        "sym-punc": "#646464"
+        "sym-punc": "#646464",
+        "markup-tag": "#c80032",
+        "markup-attr": "#5c477e",
+        "markup-deletion": {
+            "color": "#ce9178",
+            "text-decoration": "line-through"
+        },
+        "markup-insertion": {
+            "color": "#b5cea8",
+            "text-decoration": "underline"
+        },
+        "markup-emph": {
+            "font-style": "italic"
+        },
+        "markup-strong": {
+            "font-weight": "bold"
+        },
+        "markup-emph-strong": {
+            "font-style": "italic",
+            "font-weight": "bold"
+        },
+        "markup-underline": {
+            "text-decoration": "underline"
+        },
+        "markup-emph-underline": {
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strong-underline": {
+            "font-weight": "bold",
+            "text-decoration": "underline"
+        },
+        "markup-emph-strong-underline": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strikethrough": {
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-strong-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strong-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-underline-strikethrough": {
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-underline-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "markup-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        }
     },
     "dark": {
-        "err": "#ff0000",
-        "cmt": {
+        "foreground": "#e7e7e7",
+        "background": "#181818",
+        "error": "#ff0000",
+        "comment": {
             "color": "#777777",
             "font-style": "italic"
         },
-        "cmt-delim": {
+        "comment-delim": {
             "font-style": "normal"
         },
         "null": "#ff5a82",
         "bool": "#ff5a82",
-        "kw": "#ff5a82",
+        "keyword": "#ff5a82",
         "this": "#ff5a82",
-        "mk-tag": "#ff5a82",
-        "str": "#98d48e",
-        "num": "#98d48e",
-        "val": "#98d48e",
-        "mac": "#b0a9cf",
+        "string": "#98d48e",
+        "number": "#98d48e",
+        "value": "#98d48e",
+        "macro": "#b0a9cf",
         "id": "#cccccc",
         "id-var": "#a4c4de",
-        "id-attr": "#a4c4de",
-        "mk-attr": "#a4c4de",
-        "id-fun": "#ffdc9c",
+        "id-function": "#ffdc9c",
         "id-type": "#4fb0ff",
         "attr": "#ea91d4",
         "sym": "#ffffff",
-        "sym-punc": "#a0a0a0"
+        "sym-punc": "#a0a0a0",
+        "markup-tag": "#ff5a82",
+        "markup-attr": "#a4c4de",
+        "markup-deletion": {
+            "color": "#ce9178",
+            "text-decoration": "line-through"
+        },
+        "markup-insertion": {
+            "color": "#b5cea8",
+            "text-decoration": "underline"
+        },
+        "markup-emph": {
+            "font-style": "italic"
+        },
+        "markup-strong": {
+            "font-weight": "bold"
+        },
+        "markup-emph-strong": {
+            "font-style": "italic",
+            "font-weight": "bold"
+        },
+        "markup-underline": {
+            "text-decoration": "underline"
+        },
+        "markup-emph-underline": {
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strong-underline": {
+            "font-weight": "bold",
+            "text-decoration": "underline"
+        },
+        "markup-emph-strong-underline": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strikethrough": {
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-strong-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strong-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-underline-strikethrough": {
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-underline-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "markup-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        }
     }
 }
