@@ -144,11 +144,25 @@ ulight_lang ulight_get_lang(const char* name, size_t name_length) noexcept
 }
 
 ULIGHT_EXPORT
-ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) noexcept
+ulight_string_view ulight_highlight_type_long_string(ulight_highlight_type type) noexcept
+{
+    const std::string_view result
+        = ulight::highlight_type_long_string(ulight::Highlight_Type(type));
+    return { result.data(), result.size() };
+}
+
+ULIGHT_EXPORT
+ulight_string_view ulight_highlight_type_short_string(ulight_highlight_type type) noexcept
 {
     const std::string_view result
         = ulight::highlight_type_short_string(ulight::Highlight_Type(type));
     return { result.data(), result.size() };
+}
+
+ULIGHT_EXPORT
+ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) noexcept
+{
+    return ulight_highlight_type_short_string(type);
 }
 
 ULIGHT_EXPORT
@@ -343,7 +357,7 @@ ulight_status ulight_source_to_html(ulight_state* state) noexcept
             }
 
             const std::string_view id
-                = ulight::highlight_type_id(ulight::Highlight_Type(t.type));
+                = highlight_type_short_string(ulight::Highlight_Type(t.type));
             const auto source_part = source_string.substr(t.begin, t.length);
 
             buffer.push_back('<');
