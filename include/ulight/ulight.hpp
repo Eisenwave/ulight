@@ -180,8 +180,7 @@ constexpr std::string_view highlight_type_short_string(Highlight_Type type) noex
 [[deprecated("Use highlight_type_long_string or highlight_type_short_string")]] [[nodiscard]]
 inline std::string_view highlight_type_id(Highlight_Type type) noexcept
 {
-    const ulight_string_view result = ulight_highlight_type_id(ulight_highlight_type(type));
-    return { result.text, result.length };
+    return highlight_type_short_string(type);
 }
 
 /// See `ulight_token`.
