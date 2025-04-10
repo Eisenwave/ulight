@@ -348,10 +348,8 @@ typedef enum ulight_highlight_type {
 ULIGHT_DEPRECATED
 ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) ULIGHT_NOEXCEPT;
 
-ULIGHT_DEPRECATED
 ulight_string_view ulight_highlight_type_long_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
 
-ULIGHT_DEPRECATED
 ulight_string_view ulight_highlight_type_short_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
 
 typedef struct ulight_token {
