@@ -19,6 +19,12 @@
 #define nullptr ((void*)0)
 #endif
 
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+#define ULIGHT_DEPRECATED [[deprecated]]
+#else
+#define ULIGHT_DEPRECATED
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -339,7 +345,14 @@ typedef enum ulight_highlight_type {
 
 /// @brief Returns a textual representation made of ASCII characters and underscores of `type`.
 /// This is used as a value in `ulight_tokens_to_html`.
+ULIGHT_DEPRECATED
 ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) ULIGHT_NOEXCEPT;
+
+ULIGHT_DEPRECATED
+ulight_string_view ulight_highlight_type_long_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
+
+ULIGHT_DEPRECATED
+ulight_string_view ulight_highlight_type_short_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
 
 typedef struct ulight_token {
     /// @brief The index of the first code point within the source code that has the highlighting.
