@@ -382,7 +382,7 @@ public:
         if (!comment) {
             return false;
         }
-        emit_and_advance(index, comment_prefix.length(), Highlight_Type::comment_delimiter);
+        emit_and_advance(index, comment_prefix.length(), Highlight_Type::comment_delim);
         comment.length -= comment_prefix.length();
 
         if (comment.terminated) {
@@ -391,7 +391,7 @@ public:
                     index, comment.length - comment_suffix.length(), Highlight_Type::comment
                 );
             }
-            emit_and_advance(index, comment_suffix.length(), Highlight_Type::comment_delimiter);
+            emit_and_advance(index, comment_suffix.length(), Highlight_Type::comment_delim);
         }
         else if (comment.length != 0) {
             emit_and_advance(index, comment.length, Highlight_Type::comment);

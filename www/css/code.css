@@ -1,129 +1,265 @@
 @media (prefers-color-scheme: light) {
-
-    h-[data-h^=err] {
-        color: #ff0000;
-    }
-
-    h-[data-h^=cmt] {
-        color: #777777;
-        font-style: italic;
-    }
-
-    h-[data-h^=cmt_dlim] {
-        font-style: normal;
-    }
-
-    h-[data-h^=null],
-    h-[data-h^=bool],
-    h-[data-h^=kw],
-    h-[data-h^=this],
-    h-[data-h^=mk_tag] {
-        color: #c80032;
-    }
-
-    h-[data-h^=str],
-    h-[data-h^=num],
-    h-[data-h^=val] {
-        color: #367c2a;
-    }
-
-    h-[data-h^=mac] {
-        color: #3a2986;
-    }
-
-    h-[data-h^=id] {
+    .ulight-code, .ulight-code-block {
         color: #000000;
     }
-
-    h-[data-h^=id_var],
-    h-[data-h^=id_attr],
-    h-[data-h^=mk_attr] {
-        color: #5c477e;
-    }
-
-    h-[data-h^=id_fun] {
-        color: #853e7a;
-    }
-
-    h-[data-h^=id_type] {
-        color: #0050c8;
-    }
-
     h-[data-h^=attr] {
         color: #966c1c;
     }
-
-    h-[data-h^=sym] {
-        color: #000000;
+    h-[data-h^=bool] {
+        color: #c80032;
     }
-
-    h-[data-h^=sym_punc] {
-        color: #646464;
-    }
-
-}
-
-@media not (prefers-color-scheme: light) {
-
-    h-[data-h^=err] {
-        color: #ff0000;
-    }
-
     h-[data-h^=cmt] {
         color: #777777;
         font-style: italic;
     }
-
     h-[data-h^=cmt_dlim] {
         font-style: normal;
     }
-
-    h-[data-h^=null],
-    h-[data-h^=bool],
-    h-[data-h^=kw],
-    h-[data-h^=this],
-    h-[data-h^=mk_tag] {
-        color: #ff5a82;
+    h-[data-h^=err] {
+        color: #ff0000;
     }
-
-    h-[data-h^=str],
-    h-[data-h^=num],
-    h-[data-h^=val] {
-        color: #98d48e;
-    }
-
-    h-[data-h^=mac] {
-        color: #b0a9cf;
-    }
-
     h-[data-h^=id] {
-        color: #cccccc;
+        color: #000000;
     }
-
-    h-[data-h^=id_var],
-    h-[data-h^=id_attr],
-    h-[data-h^=mk_attr] {
-        color: #a4c4de;
-    }
-
     h-[data-h^=id_fun] {
-        color: #ffdc9c;
+        color: #853e7a;
     }
-
     h-[data-h^=id_type] {
-        color: #4fb0ff;
+        color: #0050c8;
     }
+    h-[data-h^=id_var] {
+        color: #5c477e;
+    }
+    h-[data-h^=kw] {
+        color: #c80032;
+    }
+    h-[data-h^=mac] {
+        color: #3a2986;
+    }
+    h-[data-h^=mk_attr] {
+        color: #5c477e;
+    }
+    h-[data-h^=mk_del] {
+        color: #ce9178;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph] {
+        font-style: italic;
+    }
+    h-[data-h^=mk_emph_strk] {
+        font-style: italic;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph_stro] {
+        font-style: italic;
+        font-weight: bold;
+    }
+    h-[data-h^=mk_emph_stro_strk] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph_stro_ulin] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_emph_stro_ulin_strk] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_emph_ulin] {
+        font-style: italic;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_emph_ulin_strk] {
+        font-style: italic;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_ins] {
+        color: #b5cea8;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_strk] {
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_stro] {
+        font-weight: bold;
+    }
+    h-[data-h^=mk_stro_strk] {
+        font-weight: bold;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_stro_ulin] {
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_stro_ulin_strk] {
+        font-weight: bold;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_tag] {
+        color: #c80032;
+    }
+    h-[data-h^=mk_ulin] {
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_ulin_strk] {
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=null] {
+        color: #c80032;
+    }
+    h-[data-h^=num] {
+        color: #367c2a;
+    }
+    h-[data-h^=str] {
+        color: #367c2a;
+    }
+    h-[data-h^=sym] {
+        color: #000000;
+    }
+    h-[data-h^=sym_punc] {
+        color: #646464;
+    }
+    h-[data-h^=this] {
+        color: #c80032;
+    }
+    h-[data-h^=val] {
+        color: #367c2a;
+    }
+}
 
+@media (prefers-color-scheme: dark) {
+    .ulight-code, .ulight-code-block {
+        color: #e7e7e7;
+    }
     h-[data-h^=attr] {
         color: #ea91d4;
     }
-
+    h-[data-h^=bool] {
+        color: #ff5a82;
+    }
+    h-[data-h^=cmt] {
+        color: #777777;
+        font-style: italic;
+    }
+    h-[data-h^=cmt_dlim] {
+        font-style: normal;
+    }
+    h-[data-h^=err] {
+        color: #ff0000;
+    }
+    h-[data-h^=id] {
+        color: #cccccc;
+    }
+    h-[data-h^=id_fun] {
+        color: #ffdc9c;
+    }
+    h-[data-h^=id_type] {
+        color: #4fb0ff;
+    }
+    h-[data-h^=id_var] {
+        color: #a4c4de;
+    }
+    h-[data-h^=kw] {
+        color: #ff5a82;
+    }
+    h-[data-h^=mac] {
+        color: #b0a9cf;
+    }
+    h-[data-h^=mk_attr] {
+        color: #a4c4de;
+    }
+    h-[data-h^=mk_del] {
+        color: #ce9178;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph] {
+        font-style: italic;
+    }
+    h-[data-h^=mk_emph_strk] {
+        font-style: italic;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph_stro] {
+        font-style: italic;
+        font-weight: bold;
+    }
+    h-[data-h^=mk_emph_stro_strk] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_emph_stro_ulin] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_emph_stro_ulin_strk] {
+        font-weight: bold;
+        font-style: italic;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_emph_ulin] {
+        font-style: italic;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_emph_ulin_strk] {
+        font-style: italic;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_ins] {
+        color: #b5cea8;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_strk] {
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_stro] {
+        font-weight: bold;
+    }
+    h-[data-h^=mk_stro_strk] {
+        font-weight: bold;
+        text-decoration: line-through;
+    }
+    h-[data-h^=mk_stro_ulin] {
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_stro_ulin_strk] {
+        font-weight: bold;
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=mk_tag] {
+        color: #ff5a82;
+    }
+    h-[data-h^=mk_ulin] {
+        text-decoration: underline;
+    }
+    h-[data-h^=mk_ulin_strk] {
+        text-decoration: underline line-through;
+    }
+    h-[data-h^=null] {
+        color: #ff5a82;
+    }
+    h-[data-h^=num] {
+        color: #98d48e;
+    }
+    h-[data-h^=str] {
+        color: #98d48e;
+    }
     h-[data-h^=sym] {
         color: #ffffff;
     }
-
     h-[data-h^=sym_punc] {
         color: #a0a0a0;
     }
-
+    h-[data-h^=this] {
+        color: #ff5a82;
+    }
+    h-[data-h^=val] {
+        color: #98d48e;
+    }
 }

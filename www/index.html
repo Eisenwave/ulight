@@ -5,9 +5,10 @@
     <meta charset="utf-8">
     <title>µlight Live Editor</title>
     <link rel=stylesheet href="fonts/fonts.css"/>
-    <link rel=stylesheet href="css/code.css"/>
     <link rel=stylesheet href="css/main.css"/>
     <link rel=stylesheet href="css/live_edit.css"/>
+    <link rel=stylesheet href="css/code.css"/>
+    <link rel=stylesheet href="css/theme.css"/>
     <link rel=icon type=image/png href="img/favicon.png"/>
 </head>
 
@@ -21,6 +22,13 @@
 
     <header>
         <h1>&micro;light</h1>
+        <select id="theme-picker">
+            <option value="default">Default</option>
+            <option value="light-ulight">µlight (Light)</option>
+            <option value="dark-ulight">µlight (Dark)</option>
+            <option value="dark-vs">Visual Studio (Dark)</option>
+            <option value="dark-vs-plus">Visual Studio Plus/Modern (Dark)</option>
+        </select>
         <select id="language-id"></select>
         <div id="split-buttons">
             <picture>
@@ -35,7 +43,7 @@
     </header>
 
     <main id="container">
-        <div id="code-input-container">
+        <div id="code-input-container" class="ulight-code-block">
             <pre id="input-line-numbers" class="line-numbers">1</pre>
             <div id="code-input-layers" class="code-font">
                 <textarea id="code-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
@@ -44,7 +52,7 @@
             </div>
         </div>
         <div id="separator"></div>
-        <div id="output-container">
+        <div id="output-container" class="ulight-code-block">
             <pre id="output-line-numbers" class="line-numbers">1</pre>
             <div id="output">awoo</div>
         </div>
