@@ -36,7 +36,7 @@ std::size_t match_comment(std::u8string_view str);
 /// str, if the character data section is not
 /// well formed we return 0
 [[nodiscard]]
-std::size_t match_character_data_section(std::u8string_view str);
+std::size_t match_cdata_section(std::u8string_view str);
 
 /// @brief matches a name as defined in the XML standard i.e 
 /// a string starting with a name start character followed by 
@@ -55,12 +55,7 @@ std::size_t match_reference(std::u8string_view str);
 [[nodiscard]]
 std::size_t match_attribute_value(std::u8string_view str);
 
-/// @brief matches a character data section at the beginning of str
-/// if there is no character data section at the beginning we return 0
-[[nodiscard]]
-std::size_t match_cdata_section(std::u8string_view str);
-
-}
+} // namespace ulight::xml
 #endif
 
 
