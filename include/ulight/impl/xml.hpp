@@ -1,26 +1,3 @@
-// declarations start with <! and end in !>
-
-// more then bare bones:
-// declarations
-// processin instructions
-// conditional sections
-
-
-// bare bones:
-// elements
-// comments
-// attributes
-// literals
-// names
-// simple prolog
-
-
-// match element (match start tag match end tag)
-// match attrlist
-// match comment
-// match cdata
-// match 
-
 #ifndef ULIGHT_XML_HPP
 #define ULIGHT_XML_HPP
 
@@ -78,5 +55,13 @@ std::size_t match_reference(std::u8string_view str);
 [[nodiscard]]
 std::size_t match_attribute_value(std::u8string_view str);
 
+/// @brief matches a character data section at the beginning of str
+/// if there is no character data section at the beginning we return 0
+[[nodiscard]]
+std::size_t match_cdata_section(std::u8string_view str);
+
 }
 #endif
+
+
+

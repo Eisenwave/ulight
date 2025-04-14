@@ -15,6 +15,8 @@ constexpr std::u8string_view comment_suffix = u8"-->";
 constexpr std::u8string_view illegal_comment_sequence = u8"--";
 constexpr std::u8string_view char_ref_start_dec = u8"&#";
 constexpr std::u8string_view char_ref_start_hex = u8"&#x";
+constexpr std::u8string_view cdata_section_prefix = u8"<![CDATA[";
+constexpr std::u8string_view cdata_section_suffix = u8"]]>";
 
 [[nodiscard]]
 constexpr bool is_xml_whitespace_character(char32_t c) {
@@ -127,7 +129,7 @@ std::size_t match_reference(std::u8string_view str) {
     length = length + 1;
   }
 
-  if (!str.starts_with(u8";")) {
+  if (!str.starts_with(u8';')) {
       return 0;
   }
 
@@ -215,8 +217,23 @@ std::size_t match_comment(std::u8string_view str) {
   return length;
 }
 
-// actually ripped from html "module", liked the idea
-// is there some genralization ?
+[[nodiscard]]
+std::size_t match_cdata_section(std::u8string_view str) {
+
+  if (!str.starts_with(cdata_section_prefix)) {
+    return 0;
+  }
+
+  std::size_t has_end = str.find_first_of(cdata_section_suffix);
+    
+  if (has_end == std::string::npos) {
+    return 0;
+  } 
+
+  return has_end + cdata_section_suffix.length();
+}
+
+// yoinked from html module, liked the idea
 struct XML_Highlighter {
 
 private:
@@ -282,22 +299,62 @@ public:
       while (!remainder.empty()) {
         if (expect_start_tag() ||
             expect_comment() ||
+            expect_reference() ||
             expect_end_tag()) {
           continue;
         } else {
-
-          return false;
+          ULIGHT_ASSERT_UNREACHABLE(u8"Unmatched XML");
         }
       }
-
       return true;
     }
 
     bool expect_prolog() {
 
-
+      return false;
     }
 
+    bool expect_cdata() {
+
+      if (std::size_t cdata_section = match_character_data_section(remainder)) { 
+        advance(cdata_section); 
+        return true;
+      } 
+
+      // maybe define peek method instead of copying
+      std::u8string_view temp = remainder;
+      std::size_t length = 0;
+      while (!temp.starts_with(cdata_section_prefix) &&
+             !temp.starts_with(u8'<') &&
+             !temp.starts_with(u8'&')) {
+        temp.remove_prefix(1);
+        length++;
+      }
+
+      if (length) {
+        advance(length);
+        return true;
+      }
+
+      return false;
+    }
+
+
+    bool expect_reference() {
+
+      std::size_t ref_length = match_reference(remainder);
+
+      if (!ref_length) {
+        return false;
+      }
+
+      emit_and_advance(index, ref_length, Highlight_Type::id_use);
+      return true;
+    }
+
+
+    // either start tag or empty element tag
+    // maybe explicit for empty element tag ?
     bool expect_start_tag() {
 
       if (!remainder.starts_with(u8"<")) {
@@ -312,13 +369,13 @@ public:
         return false;
       }
 
-      emit_and_advance(index, name_length, Highlight_Type::id);
+      emit_and_advance(index, name_length, Highlight_Type::markup_tag);
       
       while (!remainder.empty()) {
         std::size_t whitespace_length = match_whitespace(remainder);        
         advance(whitespace_length);
 
-        if (remainder.starts_with(u8">") || 
+        if (remainder.starts_with(u8'>') || 
             remainder.starts_with(u8"/>")) {
           break;
         }
@@ -328,7 +385,7 @@ public:
         }
       }
 
-      if (remainder.starts_with(u8">")) {
+      if (remainder.starts_with(u8'>')) {
         emit_and_advance(index, 1, Highlight_Type::sym_punc);
         return true;
       }
@@ -338,7 +395,7 @@ public:
         return true;
       }
 
-      return false;;
+      return false;
     }
 
     bool expect_attribute() {
@@ -353,7 +410,7 @@ public:
 
       advance(match_whitespace(remainder));
 
-      if (!remainder.starts_with(u8"=")) {
+      if (!remainder.starts_with(u8'=')) {
         return false;
       }
 
@@ -377,7 +434,17 @@ public:
         return false;
       }
 
-      emit_and_advance(index, comment_length, Highlight_Type::comment);
+      std::size_t pure_comment_index = index + comment_prefix.length();
+      std::size_t pure_comment_length = comment_length - comment_prefix.length() - comment_suffix.length();
+
+      // <!--
+      emit_and_advance(index, comment_prefix.length(), Highlight_Type::comment_delimiter); 
+
+      // actual comment
+      emit_and_advance(pure_comment_index, pure_comment_length, Highlight_Type::comment);
+
+      // -->
+      emit_and_advance(pure_comment_index + pure_comment_length, comment_suffix.length(), Highlight_Type::comment_delimiter);
       
       return true;
     }
@@ -397,9 +464,9 @@ public:
         return false;
       }
 
-      emit_and_advance(index, name_length, Highlight_Type::id);
+      emit_and_advance(index, name_length, Highlight_Type::markup_tag);
 
-      if (!remainder.starts_with(u8"/>")) {
+      if (!remainder.starts_with(u8'>')) {
         return false;
       }
 
@@ -425,6 +492,3 @@ bool highlight_xml(
 
 
 } // namespace ulight
-
-
-

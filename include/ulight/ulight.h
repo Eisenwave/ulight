@@ -39,7 +39,7 @@ enum {
 
 /// @brief A language supported by ulight for syntax highlighting.
 typedef enum ulight_lang {
-    /// @brief XML
+    /// @brief XML.
     ULIGHT_LANG_XML = 5,
     /// @brief C++.
     ULIGHT_LANG_CPP = 2,
