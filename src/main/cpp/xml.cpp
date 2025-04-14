@@ -78,7 +78,7 @@ std::size_t match_name(std::u8string_view str) {
   }
 
   length++;
-  while (is_xml_name_character(str[length])) {
+  while (length < str.length() && is_xml_name_character(str[length])) {
     length++;
   }
 
@@ -239,7 +239,7 @@ struct XML_Highlighter {
 private:
 
   std::u8string_view remainder;
-  Non_Owning_Buffer<Token> out;
+  Non_Owning_Buffer<Token>& out;
   Highlight_Options options;
 
   const std::size_t source_length = remainder.length();
@@ -292,19 +292,20 @@ private:
 public:
 
     // TODO: add prolog
-    // TODO: add element content 
+    // TODO: make sure that destructive reads do not cause chaos
     bool highlight() {
 
       expect_prolog();
       while (!remainder.empty()) {
-        if (expect_start_tag() ||
-            expect_comment() ||
-            expect_reference() ||
-            expect_end_tag()) {
+        if (expect_comment() ||
+            expect_cdata() ||
+            expect_end_tag() ||
+            expect_start_tag() ||
+            expect_reference()) {
           continue;
-        } else {
-          ULIGHT_ASSERT_UNREACHABLE(u8"Unmatched XML");
-        }
+        } 
+
+        ULIGHT_ASSERT_UNREACHABLE(u8"Unmatched XML");
       }
       return true;
     }
@@ -316,15 +317,23 @@ public:
 
     bool expect_cdata() {
 
-      if (std::size_t cdata_section = match_character_data_section(remainder)) { 
-        advance(cdata_section); 
+      if (std::size_t cdata_section = match_cdata_section(remainder)) { 
+        std::size_t pure_cdata_len = cdata_section - cdata_section_prefix.length() - cdata_section_suffix.length();
+
+        emit_and_advance(index, cdata_section_prefix.length(), Highlight_Type::macro);
+
+        advance(pure_cdata_len);
+
+        emit_and_advance(index, cdata_section_suffix.length(), Highlight_Type::macro);
+
         return true;
       } 
 
       // maybe define peek method instead of copying
       std::u8string_view temp = remainder;
       std::size_t length = 0;
-      while (!temp.starts_with(cdata_section_prefix) &&
+      while (!temp.empty() &&
+             !temp.starts_with(cdata_section_suffix) &&
              !temp.starts_with(u8'<') &&
              !temp.starts_with(u8'&')) {
         temp.remove_prefix(1);
@@ -406,13 +415,15 @@ public:
         return false;
       }
 
-      emit_and_advance(index, name_length, Highlight_Type::id);
+      emit_and_advance(index, name_length, Highlight_Type::markup_attr);
 
       advance(match_whitespace(remainder));
 
       if (!remainder.starts_with(u8'=')) {
         return false;
       }
+
+      advance(1);
 
       advance(match_whitespace(remainder));
 
@@ -434,17 +445,16 @@ public:
         return false;
       }
 
-      std::size_t pure_comment_index = index + comment_prefix.length();
       std::size_t pure_comment_length = comment_length - comment_prefix.length() - comment_suffix.length();
 
       // <!--
       emit_and_advance(index, comment_prefix.length(), Highlight_Type::comment_delimiter); 
 
       // actual comment
-      emit_and_advance(pure_comment_index, pure_comment_length, Highlight_Type::comment);
+      emit_and_advance(index, pure_comment_length, Highlight_Type::comment);
 
       // -->
-      emit_and_advance(pure_comment_index + pure_comment_length, comment_suffix.length(), Highlight_Type::comment_delimiter);
+      emit_and_advance(index, comment_suffix.length(), Highlight_Type::comment_delimiter);
       
       return true;
     }
@@ -470,7 +480,7 @@ public:
         return false;
       }
 
-      emit_and_advance(index, 2, Highlight_Type::sym_punc);
+      emit_and_advance(index, 1, Highlight_Type::sym_punc);
 
       return true;
     }
