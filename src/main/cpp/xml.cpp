@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
 #include <string>
 
 namespace ulight {
@@ -76,59 +77,6 @@ std::size_t match_name(std::u8string_view str)
     }
 
     return length;
-}
-
-// for now this works but references inside an attribute values are not highlighted properly
-[[nodiscard]]
-static std::size_t match_attribute_value_quoted(std::u8string_view str, char8_t quote_type)
-{
-
-    // remove starting quote
-    str.remove_prefix(1);
-
-    std::size_t length = 0;
-    while (!str.empty()) {
-
-        if (str.starts_with(quote_type)) {
-            return length + 2;
-        }
-
-        if (str.starts_with(u8'>')) {
-            return 0;
-        }
-
-        if (str.starts_with(u8'&')) {
-            std::size_t ref_length = html::match_character_reference(str);
-
-            if (!ref_length) {
-                return 0;
-            }
-
-            str.remove_prefix(ref_length);
-            length += ref_length;
-        }
-        else {
-            str.remove_prefix(1);
-            length++;
-        }
-    }
-
-    return length;
-}
-
-[[nodiscard]]
-std::size_t match_attribute_value(std::u8string_view str)
-{
-
-    if (str.starts_with(u8"\"")) {
-        return match_attribute_value_quoted(str, u8'\"');
-    }
-
-    if (str.starts_with(u8"\'")) {
-        return match_attribute_value_quoted(str, u8'\'');
-    }
-
-    return 0;
 }
 
 [[nodiscard]]
@@ -236,8 +184,6 @@ private:
 
 public:
     // TODO: add prolog
-    // TODO: add processing instructions
-    // TODO: make sure that destructive reads do not cause chaos
     bool highlight()
     {
 
@@ -407,13 +353,38 @@ public:
 
         advance(match_whitespace(remainder));
 
-        std::size_t attval_length = match_attribute_value(remainder);
+        return expect_attribute_value();
+    }
 
-        if (!attval_length) {
-            return false;
+    bool expect_attribute_value() {
+        
+        char8_t quote_type;
+        if (remainder.starts_with(u8'\'')) {
+          quote_type = u8'\'';
+        } else if (remainder.starts_with(u8'\"')) {
+          quote_type = u8'\"';
+        } else {
+          return false;
         }
 
-        emit_and_advance(index, attval_length, Highlight_Type::string);
+        advance(1);
+        std::size_t attval_len = 0;
+        while (attval_len < remainder.length() && remainder[attval_len] != quote_type) { 
+            if (remainder[attval_len] == u8'&') {
+                emit_and_advance(index, attval_len, Highlight_Type::string);  
+                if (!expect_reference()) { return false; }
+                attval_len = 0;
+            } else {
+              attval_len++;
+            }
+        }
+
+        if (remainder.empty()) {
+          return false;
+        }
+  
+        // is this safe ?
+        emit_and_advance(index, attval_len + 1, Highlight_Type::string);
 
         return true;
     }
