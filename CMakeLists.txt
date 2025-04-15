@@ -103,7 +103,12 @@ else(NOT DEFINED EMSCRIPTEN)
         message(STATUS "GTest not found. Skipping tests.")
     endif()
 
-    add_library(ulight STATIC ${LIBRARY_SOURCES})
+    add_library(ulight STATIC ${LIBRARY_SOURCES}
+        include/ulight/impl/ansi.hpp include/ulight/impl/assert.hpp include/ulight/impl/buffer.hpp include/ulight/impl/chars.hpp include/ulight/impl/cpp.hpp include/ulight/impl/css.hpp include/ulight/impl/highlight.hpp include/ulight/impl/html.hpp include/ulight/impl/io.hpp include/ulight/impl/lua.hpp include/ulight/impl/memory.hpp include/ulight/impl/mmml.hpp include/ulight/impl/parse_utils.hpp include/ulight/impl/platform.h include/ulight/impl/string_diff.hpp include/ulight/impl/strings.hpp include/ulight/impl/tty.hpp include/ulight/impl/unicode.hpp include/ulight/impl/unicode_algorithm.hpp include/ulight/const.hpp include/ulight/function_ref.hpp include/ulight/ulight.h include/ulight/ulight.hpp
+        include/ulight/impl/nasm.hpp
+        src/main/cpp/nasm.cpp
+
+    )
     target_include_directories(ulight PUBLIC "${CMAKE_CURRENT_LIST_DIR}/include")
 
     target_compile_options(ulight PUBLIC ${WARNING_OPTIONS} ${SANITIZER_OPTIONS})
@@ -125,6 +130,7 @@ else(NOT DEFINED EMSCRIPTEN)
         src/test/cpp/test_js.cpp
         src/test/cpp/test_unicode.cpp
         src/test/cpp/test_unicode_algorithm.cpp
+        src/test/cpp/test_nasm.cpp
     )
 
     target_link_libraries(ulight-cli ulight)

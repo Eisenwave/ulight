@@ -59,6 +59,8 @@ typedef enum ulight_lang {
     ULIGHT_LANG_LUA = 3,
     /// @brief MMML (Missing Middle Markup Language).
     ULIGHT_LANG_MMML = 1,
+    /// @brief NASM (Netwise Assembler)
+    ULIGHT_LANG_NASM = 7,
     /// @brief No langage (null result).
     ULIGHT_LANG_NONE = 0,
 } ulight_lang;

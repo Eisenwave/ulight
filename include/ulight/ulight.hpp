@@ -24,6 +24,7 @@ enum struct Lang : Underlying {
     javascript = ULIGHT_LANG_JS,
     lua = ULIGHT_LANG_LUA,
     mmml = ULIGHT_LANG_MMML,
+    nasm = ULIGHT_LANG_NASM,
     none = ULIGHT_LANG_NONE,
 };
 
