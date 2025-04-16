@@ -2,6 +2,7 @@
 #define ULIGHT_XML_HPP
 
 #include <cstddef>
+#include <functional>
 #include <string_view>
 
 namespace ulight::xml {
@@ -45,15 +46,26 @@ std::size_t match_cdata_section(std::u8string_view str);
 [[nodiscard]]
 std::size_t match_name(std::u8string_view str);
 
-/// @brief matches a reference at the beginning of str.
-/// A reference can either be a Character Reference or an Entity Reference
-[[nodiscard]]
-std::size_t match_reference(std::u8string_view str);
+struct Decl_Info_Match_Result;
+using Matcher_Type = std::function<std::size_t(std::u8string_view)>;
 
-/// @brief matches an attribute value according to the XML standard
-/// if the attribute value is not well formed we return 0
+/// @brief matches the xml version number at the beginning of str
 [[nodiscard]]
-std::size_t match_attribute_value(std::u8string_view str);
+std::size_t match_version_num(std::u8string_view str);
+
+/// @brief matches the name of an encoding scheme 
+/// at the beginning of str as stated in the XML standard.
+[[nodiscard]]
+std::size_t match_encoding_name(std::u8string_view str);
+
+/// @brief matches the yes/no at the beginning of str 
+[[nodiscard]]
+std::size_t match_standalone_option(std::u8string_view str);
+
+/// @brief matches declaration information for decl_type at the beginning 
+/// of str and uses val_matcher to match match the value for that type.
+[[nodiscard]]
+Decl_Info_Match_Result match_xml_decl_info(std::u8string_view str, std::u8string_view decl_type, const Matcher_Type& val_matcher);
 
 } // namespace ulight::xml
 #endif
