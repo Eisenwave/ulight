@@ -1,0 +1,5 @@
+\tag[100]
+\tag[id = 500, x, z = y]
+\tag[a, b, c]
+\tag[]{}
+\tag[xzy, abc = 123]{}

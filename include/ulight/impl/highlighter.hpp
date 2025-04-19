@@ -57,6 +57,13 @@ public:
     }
 
 protected:
+    /// @brief Equivalent to `remainder.empty()`.
+    [[nodiscard]]
+    bool eof() const
+    {
+        return remainder.empty();
+    }
+
     /// @brief Emits a single token into the output buffer,
     /// or coalesces it into the most recent token.
     /// @param begin The start index within the source file of the token.
@@ -70,6 +77,7 @@ protected:
         Coalescing coalescing = Coalescing::normal
     )
     {
+        ULIGHT_DEBUG_ASSERT(length != 0);
         ULIGHT_DEBUG_ASSERT(begin < source_length);
         ULIGHT_DEBUG_ASSERT(begin + length <= source_length);
 

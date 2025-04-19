@@ -98,16 +98,16 @@ TEST(Chars, is_ascii_alpha)
     }
 }
 
-TEST(Chars, is_mmml_directive_name_character)
+TEST(Chars, is_mmml_directive_name)
 {
     for (const char32_t c : all_mmml_special) {
-        EXPECT_FALSE(is_mmml_directive_name_character(c));
+        EXPECT_FALSE(is_mmml_directive_name(c));
     }
     for (const char32_t c : all_ascii_alpha) {
-        EXPECT_TRUE(is_mmml_directive_name_character(c));
+        EXPECT_TRUE(is_mmml_directive_name(c));
     }
     for (const char32_t c : all_ascii_digit) {
-        EXPECT_TRUE(is_mmml_directive_name_character(c));
+        EXPECT_TRUE(is_mmml_directive_name(c));
     }
 }
 

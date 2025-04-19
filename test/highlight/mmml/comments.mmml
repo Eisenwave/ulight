@@ -1,3 +1,4 @@
 Plain sentence.
 \comment{Commented text.}
 \comment[some, pointless = arguments]{Commented text.}
+\comment[\b{}]{sss}
