@@ -107,6 +107,7 @@ constexpr ulight_lang_entry ulight_lang_list[] {
     // make_lang_entry( u8"ts", ULIGHT_LANG_typescript ),
     // make_lang_entry( u8"tsx", ULIGHT_LANG_typescript ),
     // make_lang_entry( u8"typescript", ULIGHT_LANG_typescript ),
+    make_lang_entry("xml", ULIGHT_LANG_XML)
     make_lang_entry("patch", ULIGHT_LANG_DIFF),
     make_lang_entry("sh", ULIGHT_LANG_BASH),
     make_lang_entry("zsh", ULIGHT_LANG_BASH),
@@ -122,6 +123,7 @@ constexpr ulight_string_view ulight_lang_display_names[ULIGHT_LANG_COUNT] {
     make_sv("C++"),
     make_sv("Lua"),
     make_sv("HTML"),
+    make_sv("XML")
     make_sv("CSS"),
     make_sv("C"),
     make_sv("JavaScript"),
@@ -287,6 +289,13 @@ ulight_status ulight_source_to_tokens(ulight_state* state) noexcept
     if (state->flush_tokens == nullptr) {
         return error(state, ULIGHT_STATUS_BAD_BUFFER, u8"flush_tokens must not be null.");
     }
+    switch (state->lang) {
+    case ULIGHT_LANG_CPP:
+    case ULIGHT_LANG_HTML:
+    case ULIGHT_LANG_LUA:
+    case ULIGHT_LANG_XML:
+    case ULIGHT_LANG_MMML: break;
+    case ULIGHT_LANG_NONE: {
     if (state->lang == ULIGHT_LANG_NONE || int(state->lang) > ULIGHT_LANG_COUNT) {
         return error(
             state, ULIGHT_STATUS_BAD_LANG, u8"The given language (numeric value) is invalid."
