@@ -1,0 +1,15 @@
+div {
+   color: black;
+}
+
+.div {
+   color: #000000;
+}
+
+div:not(.div) {
+   color: rgb(0, 0, 0);
+}
+
+div>.div {
+   color: #000;
+}

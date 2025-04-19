@@ -36,6 +36,8 @@ Checks:
   - -readability-named-parameter
   - -readability-redundant-member-init
   - -readability-uppercase-literal-suffix
+  - -misc-const-correctness
+  - -misc-include-cleaner
   - -misc-non-private-member-variables-in-classes
   - -misc-no-recursion
   - -modernize-avoid-c-arrays

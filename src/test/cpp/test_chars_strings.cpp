@@ -3,18 +3,22 @@
 
 #include <gtest/gtest.h>
 
-#include "ulight/impl/chars.hpp"
+#include "ulight/impl/ascii_chars.hpp"
 #include "ulight/impl/parse_utils.hpp"
 #include "ulight/impl/strings.hpp"
 
-namespace ulight {
+#include "ulight/impl/lang/cpp_chars.hpp"
+#include "ulight/impl/lang/html_chars.hpp"
+#include "ulight/impl/lang/mmml_chars.hpp"
 
+namespace ulight {
+namespace {
+
+[[maybe_unused]]
 std::ostream& operator<<(std::ostream& out, Blank_Line blank) // NOLINT(misc-use-internal-linkage)
 {
     return out << "Blank_Line{.begin = " << blank.begin << ", .length = " << blank.length << "}";
 }
-
-namespace {
 
 using namespace std::literals;
 

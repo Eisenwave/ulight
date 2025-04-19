@@ -4,7 +4,9 @@
 #include <cstddef>
 #include <string_view>
 
-#include "ulight/impl/chars.hpp"
+#include "ulight/impl/ascii_chars.hpp"
+#include "ulight/impl/lang/cpp_chars.hpp"
+#include "ulight/impl/lang/html_chars.hpp"
 #include "ulight/impl/unicode.hpp"
 
 namespace ulight {

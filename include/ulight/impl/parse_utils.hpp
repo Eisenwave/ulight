@@ -34,13 +34,31 @@ struct Blank_Line {
 [[nodiscard]]
 Blank_Line find_blank_line_sequence(std::u8string_view str) noexcept;
 
+struct Line_Result {
+    /// @brief The length of the line contents, which is possibly zero.
+    std::size_t content_length;
+    /// @brief The length of the line terminator.
+    /// This could be `0` for an unterminated line at the end of the file,
+    /// `1` for an LF ending, or `2` for a CRLF ending.
+    std::size_t terminator_length;
+
+    [[nodiscard]]
+    constexpr friend bool operator==(Line_Result, Line_Result)
+        = default;
+};
+
+/// @brief Matches a line at the start of `str`.
+/// A line is considered to be terminated by LF, CR, or CRLF.
+[[nodiscard]]
+Line_Result match_line(std::u8string_view str);
+
 /// @brief Matches as many digits as possible, in a base of choice.
 /// For bases above 10, lower and upper case characters are permitted.
 /// @param str the string with digits at the beginning
 /// @param base in range [2, 16]
 /// @return The number of digits that belong to a numeric literal of the given base.
 [[nodiscard]]
-std::size_t match_digits(std::u8string_view str, int base);
+std::size_t match_digits(std::u8string_view str, int base = 10);
 
 /// @brief Like `parse_integer_literal`, but does not permit negative numbers and results
 /// in an unsigned integer.

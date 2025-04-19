@@ -9,9 +9,9 @@
 
 #include <gtest/gtest.h>
 
-#include "ulight/impl/chars.hpp"
 #include "ulight/impl/io.hpp"
 #include "ulight/impl/unicode.hpp"
+#include "ulight/impl/unicode_chars.hpp"
 
 namespace ulight::utf8 {
 namespace {

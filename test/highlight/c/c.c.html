@@ -1,0 +1,14 @@
+<h- data-h=mac>#include &lt;iostream&gt;</h->
+
+<h- data-h=kw_type>int</h-> <h- data-h=id>main</h-><h- data-h=sym_par>(</h-><h- data-h=sym_par>)</h->
+<h- data-h=sym_brac>{</h->
+    <h- data-h=cmt_dlim>//</h-><h- data-h=cmt> "new" should not be highlighted as a keyword</h->
+    <h- data-h=kw_type>int</h-> <h- data-h=id>new</h-> <h- data-h=sym_op>=</h-> <h- data-h=num>0</h-><h- data-h=sym_punc>;</h->
+    <h- data-h=kw_ctrl>for</h-> <h- data-h=sym_par>(</h-><h- data-h=sym_punc>;</h-><h- data-h=sym_punc>;</h-><h- data-h=sym_par>)</h-> <h- data-h=sym_brac>{</h-> <h- data-h=sym_brac>}</h->
+    <h- data-h=cmt_dlim>//</h-><h- data-h=cmt> "true" and "false" are C23 keywords, so it should be highlighted</h->
+    <h- data-h=kw_ctrl>while</h-> <h- data-h=sym_par>(</h-><h- data-h=bool>true</h-><h- data-h=sym_par>)</h-> <h- data-h=sym_brac>{</h-> <h- data-h=sym_brac>}</h->
+    <h- data-h=kw_ctrl>if</h-> <h- data-h=sym_par>(</h-><h- data-h=bool>false</h-><h- data-h=sym_par>)</h-> <h- data-h=sym_brac>{</h-> <h- data-h=sym_brac>}</h->
+    <h- data-h=cmt_dlim>//</h-><h- data-h=cmt> "nullptr" is also C23</h->
+    <h- data-h=kw_type>void</h-><h- data-h=sym_op>*</h-> <h- data-h=id>p</h-> <h- data-h=sym_op>=</h-> <h- data-h=null>nullptr</h-><h- data-h=sym_punc>;</h->
+    <h- data-h=kw_type>_BitInt</h-><h- data-h=sym_par>(</h-><h- data-h=num>32</h-><h- data-h=sym_par>)</h-> <h- data-h=id>x</h-> <h- data-h=sym_op>=</h-> <h- data-h=num>0</h-><h- data-h=sym_punc>;</h->
+<h- data-h=sym_brac>}</h->

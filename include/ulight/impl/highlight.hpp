@@ -47,6 +47,37 @@ bool highlight_html(
     const Highlight_Options& options = {}
 );
 bool highlight_xml(
+  Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
+
+bool highlight_css(
+    Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
+bool highlight_c(
+    Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
+bool highlight_javascript(
+    Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
+bool highlight_bash(
+    Non_Owning_Buffer<Token>& out,
+    std::u8string_view source,
+    std::pmr::memory_resource* memory,
+    const Highlight_Options& options = {}
+);
+bool highlight_diff(
     Non_Owning_Buffer<Token>& out,
     std::u8string_view source,
     std::pmr::memory_resource* memory,
@@ -79,6 +110,16 @@ inline Status highlight(
         return to_result(highlight_html(out, source, memory, options));
     case Lang::xml: //
         return to_result(highlight_xml(out, source, memory, options));
+    case Lang::css: //
+        return to_result(highlight_css(out, source, memory, options));
+    case Lang::c: //
+        return to_result(highlight_c(out, source, memory, options));
+    case Lang::javascript: //
+        return to_result(highlight_javascript(out, source, memory, options));
+    case Lang::bash: //
+        return to_result(highlight_bash(out, source, memory, options));
+    case Lang::diff: //
+        return to_result(highlight_diff(out, source, memory, options));
     default: //
         return Status::bad_lang;
     }

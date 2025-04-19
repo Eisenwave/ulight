@@ -2,7 +2,7 @@
 #include <compare>
 #include <functional>
 
-#include "ulight/impl/chars.hpp"
+#include "ulight/impl/unicode_chars.hpp"
 
 namespace ulight {
 namespace {

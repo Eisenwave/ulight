@@ -1,0 +1,60 @@
+name: Emscripten build and deploy to pages
+
+on:
+  push:
+    branches: ["main", "pages-action"]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pages
+        uses: actions/configure-pages@v5
+
+      - name: Install emscripten
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install latest
+          ./emsdk activate latest
+          cd ..
+          echo "-----------------"
+          ls -R emsdk/upstream/emscripten
+    
+      - name: Configure CMake
+        run: >
+          cmake -B build
+          -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
+          -DCMAKE_COLOR_DIAGNOSTIC=ON
+          -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
+          -DCMAKE_TOOLCHAIN_FILE=emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+          -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "www"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

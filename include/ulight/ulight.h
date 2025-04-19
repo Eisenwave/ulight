@@ -19,6 +19,12 @@
 #define nullptr ((void*)0)
 #endif
 
+#if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 202311L)
+#define ULIGHT_DEPRECATED [[deprecated]]
+#else
+#define ULIGHT_DEPRECATED
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,17 +40,27 @@ typedef struct ulight_string_view {
 enum {
     /// @brief The amount of unique languages supported,
     /// including `ULIGHT_LANG_NONE`.
-    ULIGHT_LANG_COUNT = 6
+    ULIGHT_LANG_COUNT = 11
 };
 
 /// @brief A language supported by ulight for syntax highlighting.
 typedef enum ulight_lang {
     /// @brief XML.
-    ULIGHT_LANG_XML = 5,
+    ULIGHT_LANG_XML = 10,
+    /// @brief Bourne Again SHell.
+    ULIGHT_LANG_BASH = 8,
+    /// @brief C.
+    ULIGHT_LANG_C = 6,
     /// @brief C++.
     ULIGHT_LANG_CPP = 2,
+    /// @brief CSS.
+    ULIGHT_LANG_CSS = 5,
+    /// @brief Unidiff, i.e. GNU `diff` output in Unified Format.
+    ULIGHT_LANG_DIFF = 9,
     /// @brief HTML.
     ULIGHT_LANG_HTML = 4,
+    /// @brief JavaScript.
+    ULIGHT_LANG_JS = 7,
     /// @brief Lua.
     ULIGHT_LANG_LUA = 3,
     /// @brief MMML (Missing Middle Markup Language).
@@ -153,22 +169,33 @@ typedef enum ulight_highlight_type {
     ULIGHT_HL_COMMENT = 0x10,
     /// @brief In all languages, the delimiting characters of a comment.
     /// For example, `//` for line comments in C++.
-    ULIGHT_HL_COMMENT_DELIMITER = 0x11,
+    ULIGHT_HL_COMMENT_DELIM = 0x11,
     /// @brief In all languages, a builtin constant, value, literal, etc. in general.
     ULIGHT_HL_VALUE = 0x12,
     /// @brief In all languages, a numeric literal, like `123`.
     ULIGHT_HL_NUMBER = 0x16,
+    /// @brief In all languages, delimiters or digit separators for numbers,
+    /// like `'` within `1'000'000` in C++, or `_` within `1_000_000` in Java.
+    ULIGHT_HL_NUMBER_DELIM = 0x17,
+    /// @brief In all language, prefixes, suffixes, units, etc. for numbers,
+    /// like `10em` or `10%` in CSS.
+    ULIGHT_HL_NUMBER_DECOR = 0x18,
     /// @brief In all languages, a string or character literal, like `"etc"`.
     ULIGHT_HL_STRING = 0x1a,
+    /// @brief In all languages, delimiters for strings, such as single or double quotes.
+    ULIGHT_HL_STRING_DELIM = 0x1b,
+    /// @brief In all language, string prefixes, suffixes, etc.,
+    /// like `u8"abc"` or `"123"sv` in C++.
+    ULIGHT_HL_STRING_DECOR = 0x1c,
     /// @brief In all languages, "escape sequences",
     /// possibly within a string literal, like `"\n"`.
-    ULIGHT_HL_ESCAPE = 0x1b,
+    ULIGHT_HL_ESCAPE = 0x20,
     /// @brief In all languages, a `null`, `nullptr`, `undefined`, etc. keyword.
-    ULIGHT_HL_NULL = 0x1c,
+    ULIGHT_HL_NULL = 0x21,
     /// @brief In all languages, a `true`, `false`, `yes`, `no`, etc. keyword.
-    ULIGHT_HL_BOOL = 0x1d,
+    ULIGHT_HL_BOOL = 0x22,
     /// @brief In all languages, a self-referential keyword, like `this` or `self`.
-    ULIGHT_HL_THIS = 0x1e,
+    ULIGHT_HL_THIS = 0x23,
 
     // 0x30..0x3f Preprocessing, macros, etc.
     // -------------------------------------------------------------------------
@@ -181,77 +208,139 @@ typedef enum ulight_highlight_type {
     ULIGHT_HL_ID = 0x40,
     /// @brief In coding languages,
     /// an identifier in a declaration.
-    ULIGHT_HL_ID_DECL = 0x42,
-    /// @brief In coding languages,
-    /// an identifier in use of a construct.
-    ULIGHT_HL_ID_USE = 0x43,
+    ULIGHT_HL_ID_DECL = 0x41,
+    /// @brief In coding languages, a variable identifier.
+    ULIGHT_HL_ID_VAR = 0x42,
     /// @brief In coding languages,
     /// an identifier in a variable declaration, like `int x;`.
-    ULIGHT_HL_ID_VAR_DECL = 0x44,
-    /// @brief In coding languages,
-    /// an identifier when a variable is used.
-    ULIGHT_HL_ID_VAR_USE = 0x45,
+    ULIGHT_HL_ID_VAR_DECL = 0x43,
+    /// @brief In coding languages, a constant identifier.
+    ULIGHT_HL_ID_CONST = 0x44,
     /// @brief In coding languages,
     /// an identifier in a constant declaration,
     /// like `const int x;`.
-    ULIGHT_HL_ID_CONST_DECL = 0x46,
-    /// @brief In coding languages,
-    /// an identifier in the use of a constant.
-    ULIGHT_HL_ID_CONST_USE = 0x47,
+    ULIGHT_HL_ID_CONST_DECL = 0x45,
+    /// @brief In coding languages, a function identifier, like `f()`.
+    ULIGHT_HL_ID_FUNCTION = 0x46,
     /// @brief In coding languages,
     /// an identifier in a function declaration,
     /// like `void f()`.
-    ULIGHT_HL_ID_FUNCTION_DECL = 0x48,
-    /// @brief In coding languages,
-    /// an identifier in the use of a function, like `f()`.
-    ULIGHT_HL_ID_FUNCTION_USE = 0x49,
+    ULIGHT_HL_ID_FUNCTION_DECL = 0x47,
+    /// @brief In coding languages, a type (alias) identifier.
+    ULIGHT_HL_ID_TYPE = 0x4a,
     /// @brief In coding languages,
     /// an identifier in the declaration of a type or type alias,
     /// like `class C`.
-    ULIGHT_HL_ID_TYPE_DECL = 0x4a,
+    ULIGHT_HL_ID_TYPE_DECL = 0x4b,
     /// @brief In coding languages,
-    /// an identifier in the use of a type or type alias.
-    ULIGHT_HL_ID_TYPE_USE = 0x4b,
+    /// an identifier in of a module, namespace, or other such construct.
+    ULIGHT_HL_ID_MODULE = 0x4c,
     /// @brief In coding languages,
     /// an identifier in the declaration of a module, namespace, or other such construct.
-    ULIGHT_HL_ID_MODULE_DECL = 0x4c,
+    ULIGHT_HL_ID_MODULE_DECL = 0x4d,
+    /// @brief In coding language, a label identifier,
+    /// like in `goto label`.
+    ULIGHT_HL_ID_LABEL = 0x4e,
     /// @brief In coding languages,
-    /// an identifier in the use of a module, namespace, or other such construct.
-    ULIGHT_HL_ID_MODULE_USE = 0x4d,
+    /// an identifier in the declaration of a label,
+    /// like in `label: while (true)`.
+    ULIGHT_HL_ID_LABEL_DECL = 0x4f,
+    /// @brief In coding languages, a (function) parameter.
+    ULIGHT_HL_ID_PARAMETER = 0x50,
+    /// @brief In coding languages,
+    /// a named argument/designator,
+    /// like in `{ .x = 0 }` in C++ or in `f(x = 3)` in Python.
+    ULIGHT_HL_ID_ARGUMENT = 0x51,
 
     /// @brief In coding languages, a keyword, like `import`.
-    ULIGHT_HL_KEYWORD = 0x50,
+    ULIGHT_HL_KEYWORD = 0x60,
     /// @brief In coding languages, a keyword that directs control flow, like `if`.
-    ULIGHT_HL_KEYWORD_CONTROL = 0x51,
+    ULIGHT_HL_KEYWORD_CONTROL = 0x61,
     /// @brief In coding languages, a keyword that specifies a type, like `int`.
-    ULIGHT_HL_KEYWORD_TYPE = 0x52,
+    ULIGHT_HL_KEYWORD_TYPE = 0x62,
+    /// @brief In coding languages, a keyword that represents an operator, like `and`.
+    ULIGHT_HL_KEYWORD_OP = 0x63,
 
     /// @brief In languages with attribute syntax, the attribute content
-    ULIGHT_HL_ATTR = 0x60,
+    ULIGHT_HL_ATTR = 0x70,
     /// @brief In languages with attribute syntax, the attribute delimiters
-    ULIGHT_HL_ATTR_DELIM = 0x61,
+    ULIGHT_HL_ATTR_DELIM = 0x71,
 
-    // 0x80..0x8f Unidiff highlighting
+    // 0x80..0x87 Diff highlighting
     // -------------------------------------------------------------------------
 
-    /// @brief In unidiff, a heading (`--- from-file`, `+++ to-file`).
+    /// @brief In diff, a heading (`--- from-file`, `+++ to-file`, `***` etc.).
     ULIGHT_HL_DIFF_HEADING = 0x80,
-    /// @brief In unidiff, a common (unmodified) line.
-    ULIGHT_HL_DIFF_COMMON = 0x81,
-    /// @brief In unidiff, a hunk heading (`@@ ... @@`)
-    ULIGHT_HL_DIFF_HUNK = 0x82,
-    /// @brief In unidiff, a deletion line.
+    /// @brief A hunk heading in unified format (`@@ ... @@`).
+    ULIGHT_HL_DIFF_HEADING_HUNK = 0x81,
+    /// @brief In diff, a common (unmodified) line,
+    /// such as a line preceded with space.
+    ULIGHT_HL_DIFF_COMMON = 0x82,
+    /// @brief In diff, a deletion line,
+    /// such as a line preceded with `-`.
     ULIGHT_HL_DIFF_DELETION = 0x83,
-    /// @brief In unidiff, an insertion line.
+    /// @brief In diff, an insertion line,
+    /// such as a line preceded with `+`.
     ULIGHT_HL_DIFF_INSERTION = 0x84,
+    /// @brief In diff, a modified line,
+    /// such as a line preceded with `!` in Context Format.
+    ULIGHT_HL_DIFF_MODIFICATION = 0x85,
 
-    // 0x90..0x9f Markup-specific highlighting
+    // 0x88..0x8a Unused
+    // -------------------------------------------------------------------------
+
+    // 0x90..0xaf Markup-specific highlighting
     // -------------------------------------------------------------------------
 
     /// @brief In Markup languages, a tag, like the name of `html` in `<html>`.
     ULIGHT_HL_MARKUP_TAG = 0x90,
     /// @brief In Markup languages, the name of an attribute.
     ULIGHT_HL_MARKUP_ATTR = 0x91,
+
+    /// @brief In Markup languages, deleted text.
+    ULIGHT_HL_MARKUP_DELETION = 0x98,
+    /// @brief In Markup languages, inserted text.
+    ULIGHT_HL_MARKUP_INSERTION = 0x99,
+
+    // Note that the following 15 values use a bitmask,
+    // where the first 4 bits are always 1010, followed by:
+    //  - 1-bit if emphasized
+    //  - 2-bit if strong
+    //  - 4-bit if underlined
+    //  - 8-bit if strikethrough
+
+    /// @brief DO NOT EMIT. Helper base value only.
+    ULIGHT_HL_MARKUP_TEXT = 0xa0,
+    /// @brief In Markup languages, emphasized text.
+    ULIGHT_HL_MARKUP_EMPH = 0xa1,
+    /// @brief In Markup languages, strong text.
+    ULIGHT_HL_MARKUP_STRONG = 0xa2,
+    /// @brief In Markup languages, emphasized, strong text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG = 0xa3,
+    /// @brief In Markup languages, underlined text.
+    ULIGHT_HL_MARKUP_UNDERLINE = 0xa4,
+    /// @brief In Markup languages, emphasized, underlined text.
+    ULIGHT_HL_MARKUP_EMPH_UNDERLINE = 0xa5,
+    /// @brief In Markup languages, strong, underlined text.
+    ULIGHT_HL_MARKUP_STRONG_UNDERLINE = 0xa6,
+    /// @brief In Markup languages, strong, underlined text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE = 0xa7,
+    /// @brief In Markup languages, strikethrough text.
+    ULIGHT_HL_MARKUP_STRIKETHROUGH = 0xa8,
+    /// @brief In Markup languages, emphasized, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRIKETHROUGH = 0xa9,
+    /// @brief In Markup languages, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_STRONG_STRIKETHROUGH = 0xaa,
+    /// @brief In Markup languages, emphasized, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_STRIKETHROUGH = 0xab,
+    /// @brief In Markup languages, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_UNDERLINE_STRIKETHROUGH = 0xac,
+    /// @brief In Markup languages, emphasized, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_UNDERLINE_STRIKETHROUGH = 0xad,
+    /// @brief In Markup languages, underlined, strong, strikethrough text.
+    ULIGHT_HL_MARKUP_STRONG_UNDERLINE_STRIKETHROUGH = 0xae,
+    /// @brief In Markup languages, emphasized, strong, underlined, strikethrough text.
+    ULIGHT_HL_MARKUP_EMPH_STRONG_UNDERLINE_STRIKETHROUGH = 0xaf,
 
     // 0xc0..0xcf Symbols with special meaning
     // -------------------------------------------------------------------------
@@ -275,11 +364,31 @@ typedef enum ulight_highlight_type {
     /// @brief Operators like `+` in languages where they have special meaning.
     ULIGHT_HL_SYM_OP = 0xc7,
 
+    // 0xd0..0xdf Shell languages, build systems, etc.
+    // -------------------------------------------------------------------------
+
+    /// @brief A command in a shell or build system.
+    ULIGHT_HL_SHELL_COMMAND = 0xd0,
+    /// @brief A builtin command in a shell or build system,
+    /// such as `echo` in Bash or `add_executable` in CMake.
+    ULIGHT_HL_SHELL_COMMAND_BUILTIN = 0xd1,
+    /// @brief An option in a shell command,
+    /// such as `-r` in `rm -r`.
+    ULIGHT_HL_SHELL_OPTION = 0xd2,
+
+    // 0xe0..0xff Unused
+    // -------------------------------------------------------------------------
+
 } ulight_highlight_type;
 
 /// @brief Returns a textual representation made of ASCII characters and underscores of `type`.
 /// This is used as a value in `ulight_tokens_to_html`.
+ULIGHT_DEPRECATED
 ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) ULIGHT_NOEXCEPT;
+
+ulight_string_view ulight_highlight_type_long_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
+
+ulight_string_view ulight_highlight_type_short_string(ulight_highlight_type type) ULIGHT_NOEXCEPT;
 
 typedef struct ulight_token {
     /// @brief The index of the first code point within the source code that has the highlighting.

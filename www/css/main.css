@@ -1,123 +1,30 @@
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 400;
-    src: url('/fonts/Roboto-Regular.ttf') format('truetype');
-}
+:root {
+    --light-text-rgb: 0, 0, 0;
+    --light-text: rgb(var(--light-text-rgb));
+    --light-background: white;
+    --light-deep-background: rgb(240, 240, 240);
 
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 400;
-    font-style: italic;
-    src: url('/fonts/Roboto-Italic.ttf') format('truetype');
+    --dark-text-rgb: 231, 231, 231;
+    --dark-text: rgb(var(--dark-text-rgb));
+    --dark-background: rgb(40, 40, 40);
+    --dark-deep-background: rgb(24, 24, 24);
 }
-
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 700;
-    src: url('/fonts/Roboto-Bold.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 700;
-    font-style: italic;
-    src: url('/fonts/Roboto-BoldItalic.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 900;
-    src: url('/fonts/Roboto-Black.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'Roboto';
-    font-weight: 900;
-    font-style: italic;
-    src: url('/fonts/Roboto-BlackItalic.ttf') format('truetype');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 400;
-    src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 400;
-    font-style: italic;
-    src: url('/fonts/JetBrainsMono-Italic.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 500;
-    src: url('/fonts/JetBrainsMono-Medium.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 500;
-    font-style: italic;
-    src: url('/fonts/JetBrainsMono-MediumItalic.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 600;
-    src: url('/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 600;
-    font-style: italic;
-    src: url('/fonts/JetBrainsMono-SemiBoldItalic.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 700;
-    src: url('/fonts/JetBrainsMono-Bold.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 700;
-    font-style: italic;
-    src: url('/fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 800;
-    src: url('/fonts/JetBrainsMono-ExtraBold.woff2') format('woff2');
-}
-
-@font-face {
-    font-family: 'JetBrains Mono';
-    font-weight: 800;
-    font-style: italic;
-    src: url('/fonts/JetBrainsMono-ExtraBoldItalic.woff2') format('woff2');
-}
-
 
 @media (prefers-color-scheme: light) {
     :root {
-        --text-rgb: 0, 0, 0;
-        --text: rgb(var(--text-rgb));
-        --background: white;
-        --deep-background: rgb(240, 240, 240);
+        --text-rgb: var(--light-text-rgb);
+        --text: var(--light-text);
+        --background: var(--light-background);
+        --deep-background: var(--light-deep-background);
     }
 }
 
 @media not (prefers-color-scheme: light) {
     :root {
-        --text-rgb: 231, 231, 231;
-        --text: rgb(var(--text-rgb));
-        --background: rgb(32, 32, 32);
-        --deep-background: rgb(24, 24, 24);
+        --text-rgb: var(--dark-text-rgb);
+        --text: var(--dark-text);
+        --background: var(--dark-background);
+        --deep-background: var(--dark-deep-background);
     }
 
     a:link {

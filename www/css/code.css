@@ -1,127 +1,15 @@
 @media (prefers-color-scheme: light) {
 
-    h-[data-h^=err] {
-        color: #ff0000;
-    }
-
-    h-[data-h^=cmt] {
-        color: #777777;
-        font-style: italic;
-    }
-
-    h-[data-h^=cmt_dlm] {
-        font-style: normal;
-    }
-
-    h-[data-h^=null],
-    h-[data-h^=bool],
-    h-[data-h^=kw],
-    h-[data-h^=this],
-    h-[data-h^=mk_tag] {
-        color: #c80032;
-    }
-
-    h-[data-h^=str],
-    h-[data-h^=num] {
-        color: #367c2a;
-    }
-
-    h-[data-h^=mac] {
-        color: #3a2986;
-    }
-
-    h-[data-h^=id] {
+    .ulight-code,
+    .ulight-code-block {
         color: #000000;
     }
-
-    h-[data-h^=id_var],
-    h-[data-h^=id_attr],
-    h-[data-h^=mk_attr] {
-        color: #5c477e;
-    }
-
-    h-[data-h^=id_fun] {
-        color: #853e7a;
-    }
-
-    h-[data-h^=id_type] {
-        color: #0050c8;
-    }
-
-    h-[data-h^=attr] {
-        color: #966c1c;
-    }
-
-    h-[data-h^=sym] {
-        color: #000000;
-    }
-
-    h-[data-h^=sym_punc] {
-        color: #646464;
-    }
-
 }
 
-@media not (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
 
-    h-[data-h^=err] {
-        color: #ff0000;
+    .ulight-code,
+    .ulight-code-block {
+        color: #e7e7e7;
     }
-
-    h-[data-h^=cmt] {
-        color: #777777;
-        font-style: italic;
-    }
-
-    h-[data-h^=cmt_dlm] {
-        font-style: normal;
-    }
-
-    h-[data-h^=null],
-    h-[data-h^=bool],
-    h-[data-h^=kw],
-    h-[data-h^=this],
-    h-[data-h^=mk_tag] {
-        color: #ff5a82;
-    }
-
-    h-[data-h^=str],
-    h-[data-h^=num] {
-        color: #98d48e;
-    }
-
-    h-[data-h^=mac] {
-        color: #b0a9cf;
-    }
-
-    h-[data-h^=id] {
-        color: #cccccc;
-    }
-
-    h-[data-h^=id_var],
-    h-[data-h^=id_attr],
-    h-[data-h^=mk_attr] {
-        color: #a4c4de;
-    }
-
-    h-[data-h^=id_fun] {
-        color: #ffdc9c;
-    }
-
-    h-[data-h^=id_type] {
-        color: #4fb0ff;
-    }
-
-    h-[data-h^=attr] {
-        color: #ea91d4;
-    }
-
-    h-[data-h^=sym] {
-        color: #ffffff;
-    }
-
-    h-[data-h^=sym_punc] {
-        color: #a0a0a0;
-    }
-
 }

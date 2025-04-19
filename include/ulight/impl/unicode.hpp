@@ -70,14 +70,15 @@ public:
 /// @brief Returns the length of the UTF-8 unit sequence (including `c`)
 /// that is encoded when `c` is the first unit in that sequence.
 ///
-/// Returns `0` if `c` is not a valid leading code unit,
+/// Returns `fallback` if `c` is not a valid leading code unit,
 /// such as if it begins with `10` or `111110`.
 [[nodiscard]]
-constexpr int sequence_length(char8_t c) noexcept
+constexpr int sequence_length(char8_t c, int fallback = 0) noexcept
 {
+    /// @brief `{ 1, 0, 2, 3, 4, 0... }`
     constexpr unsigned long lookup = 0b100'011'010'000'001;
     const int leading_ones = std::countl_one(static_cast<unsigned char>(c));
-    return leading_ones > 4 ? 0 : int((lookup >> (leading_ones * 3)) & 0x7);
+    return leading_ones > 4 ? fallback : int((lookup >> (leading_ones * 3)) & 0b111);
 }
 
 struct Code_Point_And_Length {

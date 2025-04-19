@@ -19,6 +19,7 @@
 namespace ulight {
 namespace {
 
+namespace fs = std::filesystem;
 using ulight::as_string_view;
 
 [[nodiscard]]
@@ -33,13 +34,13 @@ struct Highlight_Test : testing::Test {
     std::vector<char8_t> source;
 
     [[nodiscard]]
-    bool load_code(const std::filesystem::path& path)
+    bool load_code(const fs::path& path)
     {
         return load_utf8_file_or_error(source, path.c_str());
     }
 
     [[nodiscard]]
-    bool load_expectations(const std::filesystem::path& path)
+    bool load_expectations(const fs::path& path)
     {
         return load_utf8_file_or_error(expected, path.c_str());
     }
@@ -53,16 +54,19 @@ struct Highlight_Test : testing::Test {
 };
 
 [[nodiscard]]
-std::vector<std::filesystem::path> paths_in_directory(const std::filesystem::path& directory)
+std::vector<fs::path> paths_in_directory(const fs::path& directory)
 {
+    constexpr auto is_regular_file
+        = [](const fs::directory_entry& entry) { return entry.is_regular_file(); };
+    constexpr auto to_path = [](const fs::directory_entry& entry) -> auto& { return entry.path(); };
+
     // TODO: replace with std::from_range once supported
-    std::filesystem::directory_iterator iterator(directory);
-    std::vector<std::filesystem::path> result;
-    const auto paths_view = iterator
-        | std::views::transform([](const std::filesystem::directory_entry& entry) -> auto& {
-                                return entry.path();
-                            });
-    std::ranges::copy(paths_view, std::back_inserter(result));
+    fs::recursive_directory_iterator iterator(directory);
+    std::vector<fs::path> result;
+    std::ranges::copy(
+        iterator | std::views::filter(is_regular_file) | std::views::transform(to_path),
+        std::back_inserter(result)
+    );
     return result;
 }
 
@@ -71,25 +75,19 @@ TEST_F(Highlight_Test, file_tests)
     Token token_buffer[4096];
     char text_buffer[8192];
 
-    static const std::filesystem::path directory { "test/highlight" };
-    ASSERT_TRUE(std::filesystem::is_directory(directory));
+    static const fs::path directory { "test/highlight" };
+    ASSERT_TRUE(fs::is_directory(directory));
 
-    std::vector<std::filesystem::path> paths = paths_in_directory(directory);
+    std::vector<fs::path> paths = paths_in_directory(directory);
     std::ranges::sort(paths);
 
     for (const auto& input_path : paths) {
         const std::u8string extension = input_path.extension().generic_u8string();
         ASSERT_TRUE(extension.size() > 1);
 
-        std::filesystem::path expectations_path = input_path;
+        fs::path expectations_path = input_path;
         expectations_path += ".html";
-        if (!std::filesystem::is_regular_file(expectations_path)) {
-            if (extension != u8".html") {
-                std::cout << ansi::h_yellow << "NO EXPECTATIONS: " //
-                          << ansi::reset << input_path << '\n';
-            }
-            continue;
-        }
+        const bool has_expectations = fs::is_regular_file(expectations_path);
 
         const std::u8string_view lang_name = std::u8string_view(extension).substr(1);
         const Lang lang = get_lang(lang_name);
@@ -103,7 +101,7 @@ TEST_F(Highlight_Test, file_tests)
 
         clear();
 
-        if (!load_code(input_path) || !load_expectations(expectations_path)) {
+        if (!load_code(input_path) || (has_expectations && !load_expectations(expectations_path))) {
             continue;
         }
 
@@ -118,16 +116,21 @@ TEST_F(Highlight_Test, file_tests)
         state.set_token_buffer(token_buffer);
         state.set_text_buffer(text_buffer);
         state.on_flush_text(flush_buffer);
-        const Status status = state.source_to_html();
-        EXPECT_EQ(status, Status::ok);
-        if (status != Status::ok) {
+
+        const auto pretty_print_error = [&] {
             std::cout << ansi::h_red << "ERROR: " //
                       << ansi::reset << input_path //
                       << ansi::h_black << " (" << state.get_error_string() << ")\n";
+        };
+
+        const Status status = state.source_to_html();
+        EXPECT_EQ(status, Status::ok);
+        if (status != Status::ok) {
+            pretty_print_error();
             continue;
         }
 
-        const bool compare_succeeded = expected == actual;
+        const bool compare_succeeded = !has_expectations || expected == actual;
         if (!compare_succeeded) {
             std::cout << ansi::h_red << "FAIL: " //
                       << ansi::reset << input_path //
@@ -139,8 +142,113 @@ TEST_F(Highlight_Test, file_tests)
         EXPECT_TRUE(compare_succeeded);
 
         std::cout << ansi::h_green << "OK: " //
-                  << ansi::reset << input_path.generic_string() << '\n';
+                  << ansi::reset << input_path.generic_string();
+        if (!has_expectations && extension != u8".html") {
+            std::cout << ansi::h_yellow << " (no expectations)" //
+                      << ansi::reset;
+        }
+        std::cout << '\n';
     }
+}
+
+[[nodiscard]]
+std::string_view lang_display_name(ulight_lang lang)
+{
+    const auto i = std::size_t(lang);
+    return { ulight_lang_display_names[i].text, ulight_lang_display_names[i].length };
+}
+
+TEST_F(Highlight_Test, exhaustive_one_char)
+{
+    Token token_buffer[16];
+    char8_t source;
+
+    bool success = true;
+    for (int i = 1; i < int(ULIGHT_LANG_COUNT); ++i) {
+        bool lang_success = true;
+        const auto lang = ulight_lang(i);
+        const std::string_view source_view { reinterpret_cast<const char*>(&source), 1 };
+
+        State state;
+        state.set_source(source_view);
+        state.set_lang(lang);
+        state.set_token_buffer(token_buffer);
+        state.on_flush_tokens(Constant<[](Token* tokens, std::size_t amount) {
+            ULIGHT_ASSERT(amount <= 1);
+            if (amount != 0) {
+                ULIGHT_ASSERT(tokens != nullptr);
+                ULIGHT_ASSERT(tokens->begin == 0);
+                ULIGHT_ASSERT(tokens->length == 1);
+            }
+        }> {});
+
+        for (char8_t i = 0; i <= u8'\u007F'; ++i) {
+            source = i;
+            const Status status = state.source_to_tokens();
+            if (status != Status::ok && status != Status::bad_code) {
+                lang_success = false;
+                std::cout << ansi::h_red << "FAIL: " << ansi::reset << lang_display_name(lang) //
+                          << ", for" << " U+00" << std::hex << int(source) << std::dec;
+                if (!is_html_ascii_control(source)) {
+                    std::cout << " '" << source_view << '\'';
+                }
+                std::cout << ": " << state.get_error_string() << "\n";
+            }
+        }
+
+        if (lang_success) {
+            std::cout << ansi::h_green << "OK: " << ansi::reset << lang_display_name(lang) << '\n';
+        }
+        else {
+            success = false;
+        }
+    }
+    ASSERT_TRUE(success);
+}
+
+TEST_F(Highlight_Test, exhaustive_three_chars)
+{
+    Token token_buffer[16];
+    char8_t source[3];
+
+    bool success = true;
+    for (int i = 1; i < int(ULIGHT_LANG_COUNT); ++i) {
+        bool lang_success = true;
+        const auto lang = ulight_lang(i);
+        const std::string_view source_view { reinterpret_cast<const char*>(&source),
+                                             std::size(source) };
+
+        State state;
+        state.set_source(source_view);
+        state.set_lang(lang);
+        state.set_token_buffer(token_buffer);
+        state.on_flush_tokens(Constant<[](Token*, std::size_t amount) { //
+            ULIGHT_ASSERT(amount <= sizeof(source));
+        }> {});
+
+        for (std::size_t i = 0; i < 1uz << 21; ++i) {
+            source[0] = (i >> 0) & 0x7f;
+            source[1] = (i >> 7) & 0x7f;
+            source[2] = (i >> 14) & 0x7f;
+
+            const Status status = state.source_to_tokens();
+            if (status != Status::ok && status != Status::bad_code) {
+                lang_success = false;
+                std::cout << ansi::h_red << "FAIL: " //
+                          << ansi::reset << lang_display_name(lang) //
+                          << ": " << state.get_error_string() << "\n";
+                break;
+            }
+        }
+
+        if (lang_success) {
+            std::cout << ansi::h_green << "OK: " << ansi::reset << lang_display_name(lang) << '\n';
+        }
+        else {
+            success = false;
+        }
+    }
+    ASSERT_TRUE(success);
 }
 
 } // namespace

@@ -120,6 +120,34 @@ inline void split_lines(std::vector<std::u8string_view>& out, std::u8string_view
     out.push_back(str.substr(prev));
 }
 
+inline void
+print_diff_line(std::ostream& out, std::u8string_view line, std::string_view default_formatting)
+{
+    bool formatting_dirty = false;
+    while (!line.empty()) {
+        const std::size_t safe_length = line.find_first_of(u8"\t\r\v");
+        if (safe_length != 0 && formatting_dirty) {
+            out << default_formatting;
+        }
+        if (safe_length == std::u8string_view::npos) {
+            out << as_string_view(line);
+            return;
+        }
+        if (safe_length != 0) {
+            out << as_string_view(line.substr(0, safe_length));
+        }
+        out << ansi::h_yellow;
+        switch (line[safe_length]) {
+        case u8'\t': out << "\\t"; break;
+        case u8'\r': out << "\\r"; break;
+        case u8'\v': out << "\\v"; break;
+        default: ULIGHT_ASSERT_UNREACHABLE(u8"Unexpected non-safe character.");
+        }
+        formatting_dirty = true;
+        line.remove_prefix(safe_length + 1);
+    }
+}
+
 inline void print_diff(
     std::ostream& out,
     std::span<const std::u8string_view> from_lines,
@@ -132,18 +160,24 @@ inline void print_diff(
     for (const auto e : edits) {
         switch (e) {
         case Edit_Type::common: {
-            out << ansi::h_black << ' ' << as_string_view(from_lines[from_index]) << '\n';
+            out << ansi::h_black << ' ';
+            print_diff_line(out, from_lines[from_index], ansi::h_black);
+            out << '\n';
             ++from_index;
             ++to_index;
             break;
         }
         case Edit_Type::del: {
-            out << ansi::h_red << '-' << as_string_view(from_lines[from_index]) << '\n';
+            out << ansi::h_red << '-';
+            print_diff_line(out, from_lines[from_index], ansi::h_red);
+            out << '\n';
             ++from_index;
             break;
         }
         case Edit_Type::ins: {
-            out << ansi::h_green << '+' << as_string_view(to_lines[to_index]) << '\n';
+            out << ansi::h_green << '+';
+            print_diff_line(out, to_lines[to_index], ansi::h_green);
+            out << '\n';
             ++to_index;
             break;
         }

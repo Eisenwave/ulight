@@ -38,6 +38,10 @@ public:
         , m_flush_data { flush_data }
         , m_flush { flush }
     {
+        ULIGHT_ASSERT(m_buffer != nullptr);
+        ULIGHT_ASSERT(m_capacity != 0);
+        // We deliberately have no expectations towards m_flush_data.
+        ULIGHT_ASSERT(m_flush != nullptr);
     }
 
     [[nodiscard]]
@@ -97,14 +101,18 @@ public:
     constexpr value_type& push_back(const value_type& e)
         requires std::is_copy_assignable_v<value_type>
     {
-        try_reserve(1);
+        if (full()) {
+            flush();
+        }
         return m_buffer[m_size++] = e;
     }
 
     constexpr value_type& push_back(value_type&& e)
         requires std::is_move_assignable_v<value_type>
     {
-        try_reserve(1);
+        if (full()) {
+            flush();
+        }
         return m_buffer[m_size++] = std::move(e);
     }
 
@@ -113,7 +121,9 @@ public:
         requires std::is_constructible_v<value_type, Args&&...>
         && std::is_move_assignable_v<value_type>
     {
-        try_reserve(1);
+        if (full()) {
+            flush();
+        }
         return m_buffer[m_size++] = value_type(std::forward<Args>(args)...);
     }
 
@@ -130,6 +140,7 @@ public:
         requires std::convertible_to<std::iter_reference_t<Iter>, value_type>
     constexpr void append(Iter begin, Iter end)
     {
+        ULIGHT_DEBUG_ASSERT(begin <= end);
         using Diff = std::iter_difference_t<Iter>;
         while (begin != end) {
             if (full()) {
@@ -137,6 +148,9 @@ public:
             }
             const auto chunk_size = std::min(available(), std::size_t(end - begin));
             ULIGHT_DEBUG_ASSERT(chunk_size != 0);
+            ULIGHT_DEBUG_ASSERT(begin + Diff(chunk_size) <= end);
+            ULIGHT_DEBUG_ASSERT(m_size + chunk_size <= m_capacity);
+
             std::ranges::copy(begin, begin + Diff(chunk_size), m_buffer + m_size);
             begin += Diff(chunk_size);
             m_size += chunk_size;
@@ -171,15 +185,6 @@ public:
         if (m_size != 0) {
             m_flush(m_flush_data, m_buffer, m_size);
             m_size = 0;
-        }
-    }
-
-private:
-    constexpr void try_reserve(std::size_t amount)
-    {
-        ULIGHT_DEBUG_ASSERT(m_capacity != 0);
-        if (m_size + amount > m_capacity) {
-            flush();
         }
     }
 };

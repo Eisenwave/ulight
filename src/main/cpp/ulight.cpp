@@ -3,6 +3,7 @@
 #include <new>
 #include <string_view>
 
+#include "ulight/impl/strings.hpp"
 #include "ulight/ulight.h"
 #include "ulight/ulight.hpp"
 
@@ -25,28 +26,29 @@ ulight::Highlight_Options to_options(ulight_flag flags) noexcept
 }
 
 [[nodiscard]]
-std::string_view html_entity_of(char c)
+std::u8string_view html_entity_of(char8_t c)
 {
     switch (c) {
-    case '&': return "&amp;";
-    case '<': return "&lt;";
-    case '>': return "&gt;";
-    case '\'': return "&apos;";
-    case '"': return "&quot;";
+    case u8'&': return u8"&amp;";
+    case u8'<': return u8"&lt;";
+    case u8'>': return u8"&gt;";
+    case u8'\'': return u8"&apos;";
+    case u8'"': return u8"&quot;";
     default: ULIGHT_DEBUG_ASSERT_UNREACHABLE(u8"We only support a handful of characters.");
     }
 }
 
 void append_html_escaped(Non_Owning_Buffer<char>& out, std::string_view text)
 {
+    constexpr std::u8string_view escaped_chars = u8"<>&";
     while (!text.empty()) {
-        const std::size_t bracket_pos = text.find_first_of("<>&");
+        const std::size_t bracket_pos = text.find_first_of(as_string_view(escaped_chars));
         const auto snippet = text.substr(0, std::min(text.length(), bracket_pos));
         out.append_range(snippet);
         if (bracket_pos == std::string_view::npos) {
             break;
         }
-        out.append_range(html_entity_of(text[bracket_pos]));
+        out.append_range(html_entity_of(char8_t(text[bracket_pos])));
         text = text.substr(bracket_pos + 1);
     }
 }
@@ -72,27 +74,33 @@ consteval ulight_string_view make_sv(std::string_view name)
 
 } // namespace
 
+// When adding a new language,
+// add all the aliases that highlight.js supports:
+// https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
+
 // clang-format off
 ULIGHT_EXPORT
 constexpr ulight_lang_entry ulight_lang_list[] {
-    //make_lang_entry( u8"c", ULIGHT_LANG_c ),
+    make_lang_entry("bash", ULIGHT_LANG_BASH),
+    make_lang_entry("c", ULIGHT_LANG_C),
     make_lang_entry("c++", ULIGHT_LANG_CPP),
     make_lang_entry("cc", ULIGHT_LANG_CPP),
     make_lang_entry("cplusplus", ULIGHT_LANG_CPP),
     make_lang_entry("cpp", ULIGHT_LANG_CPP),
-    // make_lang_entry( "css", ULIGHT_LANG_css ),
+    make_lang_entry("css", ULIGHT_LANG_CSS),
     // make_lang_entry( "cts", ULIGHT_LANG_typescript ),
     make_lang_entry("cxx", ULIGHT_LANG_CPP),
-    // make_lang_entry( u8"h", ULIGHT_LANG_c ),
+    make_lang_entry("diff", ULIGHT_LANG_DIFF),
+    make_lang_entry("h", ULIGHT_LANG_C),
     make_lang_entry("h++", ULIGHT_LANG_CPP),
     make_lang_entry("hpp", ULIGHT_LANG_CPP),
     make_lang_entry("htm", ULIGHT_LANG_HTML),
     make_lang_entry("html", ULIGHT_LANG_HTML),
     make_lang_entry("hxx", ULIGHT_LANG_CPP),
     // make_lang_entry( u8"java", ULIGHT_LANG_java ),
-    // make_lang_entry( u8"javascript", ULIGHT_LANG_javascript ),
-    // make_lang_entry( u8"js", ULIGHT_LANG_javascript ),
-    // make_lang_entry( u8"jsx", ULIGHT_LANG_javascript ),
+    make_lang_entry("javascript", ULIGHT_LANG_JS),
+    make_lang_entry("js", ULIGHT_LANG_JS),
+    make_lang_entry("jsx", ULIGHT_LANG_JS),
     make_lang_entry("lua", ULIGHT_LANG_LUA),
     make_lang_entry("mmml", ULIGHT_LANG_MMML),
     // make_lang_entry( u8"mts", ULIGHT_LANG_typescript ),
@@ -100,6 +108,9 @@ constexpr ulight_lang_entry ulight_lang_list[] {
     // make_lang_entry( u8"tsx", ULIGHT_LANG_typescript ),
     // make_lang_entry( u8"typescript", ULIGHT_LANG_typescript ),
     make_lang_entry("xml", ULIGHT_LANG_XML)
+    make_lang_entry("patch", ULIGHT_LANG_DIFF),
+    make_lang_entry("sh", ULIGHT_LANG_BASH),
+    make_lang_entry("zsh", ULIGHT_LANG_BASH),
 };
 
 ULIGHT_EXPORT
@@ -113,8 +124,17 @@ constexpr ulight_string_view ulight_lang_display_names[ULIGHT_LANG_COUNT] {
     make_sv("Lua"),
     make_sv("HTML"),
     make_sv("XML")
+    make_sv("CSS"),
+    make_sv("C"),
+    make_sv("JavaScript"),
+    make_sv("Bash"),
+    make_sv("Diff")
 };
 // clang-format on
+
+static_assert(std::ranges::none_of(ulight_lang_display_names, [](ulight_string_view str) {
+    return str.length == 0;
+}));
 
 namespace {
 
@@ -140,10 +160,25 @@ ulight_lang ulight_get_lang(const char* name, size_t name_length) noexcept
 }
 
 ULIGHT_EXPORT
+ulight_string_view ulight_highlight_type_long_string(ulight_highlight_type type) noexcept
+{
+    const std::string_view result
+        = ulight::highlight_type_long_string(ulight::Highlight_Type(type));
+    return { result.data(), result.size() };
+}
+
+ULIGHT_EXPORT
+ulight_string_view ulight_highlight_type_short_string(ulight_highlight_type type) noexcept
+{
+    const std::string_view result
+        = ulight::highlight_type_short_string(ulight::Highlight_Type(type));
+    return { result.data(), result.size() };
+}
+
+ULIGHT_EXPORT
 ulight_string_view ulight_highlight_type_id(ulight_highlight_type type) noexcept
 {
-    const std::string_view result = ulight::ulight_highlight_type_id(ulight::Highlight_Type(type));
-    return { result.data(), result.size() };
+    return ulight_highlight_type_short_string(type);
 }
 
 ULIGHT_EXPORT
@@ -217,9 +252,26 @@ ulight_status error(ulight_state* state, ulight_status status, std::u8string_vie
     return status;
 }
 
+void check_flush_validity(ulight_state* state, std::span<const ulight_token> tokens)
+{
+    const std::string_view source { state->source, state->source_length };
+    for (std::size_t i = 0; i < tokens.size(); ++i) {
+        const auto& t = tokens[i];
+        ULIGHT_ASSERT(t.begin < source.length());
+        ULIGHT_ASSERT(t.begin + t.length <= source.length());
+        if (i + 1 == tokens.size()) {
+            continue;
+        }
+        const auto& next = tokens[i + 1];
+        ULIGHT_ASSERT(t.begin < next.begin);
+        ULIGHT_ASSERT(t.begin + t.length <= next.begin);
+    }
+}
+
 } // namespace
 
 ULIGHT_EXPORT
+// NOLINTNEXTLINE(bugprone-exception-escape)
 ulight_status ulight_source_to_tokens(ulight_state* state) noexcept
 {
     if (state->source == nullptr && state->source_length != 0) {
@@ -244,10 +296,10 @@ ulight_status ulight_source_to_tokens(ulight_state* state) noexcept
     case ULIGHT_LANG_XML:
     case ULIGHT_LANG_MMML: break;
     case ULIGHT_LANG_NONE: {
+    if (state->lang == ULIGHT_LANG_NONE || int(state->lang) > ULIGHT_LANG_COUNT) {
         return error(
             state, ULIGHT_STATUS_BAD_LANG, u8"The given language (numeric value) is invalid."
         );
-    }
     }
 
     ulight::Non_Owning_Buffer<ulight_token> buffer { state->token_buffer,
@@ -328,6 +380,10 @@ ulight_status ulight_source_to_html(ulight_state* state) noexcept
     std::size_t previous_end = 0;
     auto flush_text = // clang-format off
     [&](const ulight_token* tokens, std::size_t amount) mutable  {
+        #ifndef NDEBUG
+        check_flush_validity(state, {tokens, amount}); 
+        #endif
+
         for (std::size_t i = 0; i < amount; ++i) {
             const auto& t = tokens[i];
             if (t.begin > previous_end) {
@@ -336,7 +392,7 @@ ulight_status ulight_source_to_html(ulight_state* state) noexcept
             }
 
             const std::string_view id
-                = ulight::highlight_type_id(ulight::Highlight_Type(t.type));
+                = highlight_type_short_string(ulight::Highlight_Type(t.type));
             const auto source_part = source_string.substr(t.begin, t.length);
 
             buffer.push_back('<');

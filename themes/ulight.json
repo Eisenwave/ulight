@@ -1,0 +1,243 @@
+{
+    "meta": {
+        "name": "ulight",
+        "author": "ulight",
+        "url": "https://github.com/Eisenwave/ulight"
+    },
+    "light": {
+        "background": "#f0f0f0",
+        "foreground": "#000000",
+        "error": "#ff0000",
+        "comment": {
+            "color": "#777777",
+            "font-style": "italic"
+        },
+        "comment-delim": {
+            "font-style": "normal"
+        },
+        "null": "#c80032",
+        "bool": "#c80032",
+        "keyword": "#c80032",
+        "this": "#c80032",
+        "string": "#367c2a",
+        "string-delim": "#2b5403",
+        "string-decor": "#2b5403",
+        "escape": "#94b500",
+        "number": "#1d51a1",
+        "number-delim": "#032354",
+        "number-decor": "#032354",
+        "value": "#367c2a",
+        "macro": "#3a2986",
+        "id": "#000000",
+        "id-var": "#5c477e",
+        "id-function": "#853e7a",
+        "id-type": "#0050c8",
+        "id-parameter": "#5c477e",
+        "id-argument": "#5c477e",
+        "attr": "#966c1c",
+        "sym": "#000000",
+        "sym-punc": "#646464",
+        "diff-heading": "#777777",
+        "diff-heading-hunk": "#5c477e",
+        "diff-common": "#000000",
+        "diff-deletion": {
+            "color": "#b31d28",
+            "background-color": "#ffeef0"
+        },
+        "diff-insertion": {
+            "color": "#22863a",
+            "background-color": "#f0fff4"
+        },
+        "diff-modification": {
+            "color": "#7a680d",
+            "background-color": "#fffdee"
+        },
+        "markup-tag": "#c80032",
+        "markup-attr": "#5c477e",
+        "markup-deletion": {
+            "color": "#ce9178",
+            "text-decoration": "line-through"
+        },
+        "markup-insertion": {
+            "color": "#b5cea8",
+            "text-decoration": "underline"
+        },
+        "markup-emph": {
+            "font-style": "italic"
+        },
+        "markup-strong": {
+            "font-weight": "bold"
+        },
+        "markup-emph-strong": {
+            "font-style": "italic",
+            "font-weight": "bold"
+        },
+        "markup-underline": {
+            "text-decoration": "underline"
+        },
+        "markup-emph-underline": {
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strong-underline": {
+            "font-weight": "bold",
+            "text-decoration": "underline"
+        },
+        "markup-emph-strong-underline": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strikethrough": {
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-strong-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strong-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-underline-strikethrough": {
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-underline-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "markup-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        }
+    },
+    "dark": {
+        "foreground": "#e7e7e7",
+        "background": "#181818",
+        "error": "#ff0000",
+        "comment": {
+            "color": "#777777",
+            "font-style": "italic"
+        },
+        "comment-delim": {
+            "font-style": "normal"
+        },
+        "null": "#ff5a82",
+        "bool": "#ff5a82",
+        "keyword": "#ff5a82",
+        "this": "#ff5a82",
+        "string": "#cf9e7e",
+        "string-delim": "#db8d7b",
+        "string-decor": "#db8d7b",
+        "escape": "#edc385",
+        "number": "#8cbade",
+        "number-delim": "#669dd9",
+        "number-decor": "#669dd9",
+        "value": "#98d48e",
+        "macro": "#b0a9cf",
+        "id": "#cccccc",
+        "id-var": "#a4c4de",
+        "id-function": "#ffdc9c",
+        "id-type": "#4fb0ff",
+        "id-parameter": "#a4c4de",
+        "id-argument": "#a4c4de",
+        "attr": "#ea91d4",
+        "sym": "#ffffff",
+        "sym-punc": "#a0a0a0",
+        "diff-heading": "#777777",
+        "diff-heading-hunk": "#edc385",
+        "diff-common": "#e7e7e7",
+        "diff-deletion": {
+            "color": "#ffdcd7",
+            "background-color": "#67060c"
+        },
+        "diff-insertion": {
+            "color": "#aff5b4",
+            "background-color": "#033a16"
+        },
+        "diff-modification": {
+            "color": "#fff4d7",
+            "background-color": "#674d06"
+        },
+        "markup-tag": "#ff5a82",
+        "markup-attr": "#a4c4de",
+        "markup-deletion": {
+            "color": "#ce9178",
+            "text-decoration": "line-through"
+        },
+        "markup-insertion": {
+            "color": "#b5cea8",
+            "text-decoration": "underline"
+        },
+        "markup-emph": {
+            "font-style": "italic"
+        },
+        "markup-strong": {
+            "font-weight": "bold"
+        },
+        "markup-emph-strong": {
+            "font-style": "italic",
+            "font-weight": "bold"
+        },
+        "markup-underline": {
+            "text-decoration": "underline"
+        },
+        "markup-emph-underline": {
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strong-underline": {
+            "font-weight": "bold",
+            "text-decoration": "underline"
+        },
+        "markup-emph-strong-underline": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline"
+        },
+        "markup-strikethrough": {
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-strong-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "line-through"
+        },
+        "markup-emph-strong-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "line-through"
+        },
+        "markup-underline-strikethrough": {
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-underline-strikethrough": {
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "markup-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "text-decoration": "underline line-through"
+        },
+        "markup-emph-strong-underline-strikethrough": {
+            "font-weight": "bold",
+            "font-style": "italic",
+            "text-decoration": "underline line-through"
+        },
+        "shell-command": "#ff5a82",
+        "shell-option": "#a4c4de"
+    }
+}
