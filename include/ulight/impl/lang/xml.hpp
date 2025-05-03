@@ -2,9 +2,11 @@
 #define ULIGHT_XML_HPP
 
 #include <cstddef>
-#include <functional>
 #include <set>
 #include <string_view>
+
+#include "ulight/impl/lang/xml_chars.hpp"
+#include "ulight/impl/unicode_algorithm.hpp"
 
 #include "html.hpp"
 
@@ -25,11 +27,23 @@ struct Name_Match_Result {
 /// beginning of str satisfies the predicate is_stop_sequence.
 /// Characters that are not allowed in a name e.g & and > are
 /// marked for later highlighting.
+template <auto is_stop>
 [[nodiscard]]
-Name_Match_Result match_name_permissive(
-    std::u8string_view str,
-    const std::function<bool(std::u8string_view)>& is_stop_sequence
-);
+Name_Match_Result match_name_permissive(const std::u8string_view str)
+{
+    Name_Match_Result result {};
+
+    while (result.length < str.length() && !is_stop(str.substr(result.length))) {
+        const auto [code_point, length]
+            = utf8::decode_and_length_or_throw(str.substr(result.length));
+        if ((result.length == 0 && !is_xml_name_start(code_point)) || !is_xml_name(code_point)) {
+            result.error_indicies.insert(result.length);
+        }
+        result.length += std::size_t(length);
+    }
+
+    return result;
+}
 
 /// @brief matches a comment at the start of str
 /// according to the XML standard

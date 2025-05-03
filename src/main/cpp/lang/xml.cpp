@@ -11,7 +11,6 @@
 #include "ulight/ulight.hpp"
 
 #include <cctype>
-#include <functional>
 
 namespace ulight {
 
@@ -24,6 +23,42 @@ constexpr std::u8string_view comment_suffix = u8"-->";
 constexpr std::u8string_view illegal_comment_sequence = u8"--";
 constexpr std::u8string_view cdata_section_prefix = u8"<![CDATA[";
 constexpr std::u8string_view cdata_section_suffix = u8"]]>";
+constexpr std::u8string_view tag_suffix = u8">";
+
+struct End_Tag_Name_Stop {
+
+    bool operator()(std::u8string_view str) const
+    {
+        return !str.empty() && (str.starts_with(tag_suffix));
+    }
+};
+
+struct Start_Tag_Name_Stop {
+
+    bool operator()(std::u8string_view str) const
+    {
+        return !str.empty()
+            && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix));
+    }
+};
+
+struct Processing_Instr_Name_Stop {
+
+    bool operator()(std::u8string_view str) const
+    {
+        return !str.empty() && (match_whitespace(str) || str.starts_with(u8"?>"));
+    }
+};
+
+struct Attribute_Name_Stop {
+
+    bool operator()(std::u8string_view str) const
+    {
+        return !str.empty()
+            && (match_whitespace(str) || str.starts_with(u8'=') || str.starts_with(u8'>')
+                || str.starts_with(u8"/>"));
+    }
+};
 
 [[nodiscard]]
 bool contains_xml_string(std::u8string_view str)
@@ -46,26 +81,6 @@ bool contains_xml_string(std::u8string_view str)
 std::size_t match_whitespace(std::u8string_view str)
 {
     return ascii::length_if(str, [](char8_t c) { return is_xml_whitespace(c); });
-}
-
-[[nodiscard]]
-Name_Match_Result match_name_permissive(
-    const std::u8string_view str,
-    const std::function<bool(std::u8string_view)>& is_stop_sequence
-)
-{
-    Name_Match_Result result {};
-
-    while (result.length < str.length() && !is_stop_sequence(str.substr(result.length))) {
-        const auto [code_point, length]
-            = utf8::decode_and_length_or_throw(str.substr(result.length));
-        if ((result.length == 0 && !is_xml_name_start(code_point)) || !is_xml_name(code_point)) {
-            result.error_indicies.insert(result.length);
-        }
-        result.length += std::size_t(length);
-    }
-
-    return result;
 }
 
 [[nodiscard]]
@@ -181,9 +196,7 @@ public:
         }
 
         emit_and_advance(2, Highlight_Type::sym_punc);
-        Name_Match_Result target = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty() && (match_whitespace(seq) || seq.starts_with(u8"?>"));
-        });
+        Name_Match_Result target = match_name_permissive<Processing_Instr_Name_Stop {}>(remainder);
 
         if (!target.length) {
             return true;
@@ -257,10 +270,7 @@ public:
 
         emit_and_advance(1, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty()
-                && (match_whitespace(seq) || seq.starts_with(u8"/>") || seq.starts_with(u8">"));
-        });
+        Name_Match_Result name = match_name_permissive<Start_Tag_Name_Stop {}>(remainder);
 
         if (!name.length) {
             return true;
@@ -293,11 +303,7 @@ public:
 
     bool expect_attribute()
     {
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty()
-                && (match_whitespace(seq) || seq.starts_with(u8'=') || seq.starts_with(u8'>')
-                    || seq.starts_with(u8"/>"));
-        });
+        Name_Match_Result name = match_name_permissive<Attribute_Name_Stop {}>(remainder);
 
         highlight_name(name, Highlight_Type::markup_attr);
 
@@ -405,9 +411,7 @@ public:
 
         emit_and_advance(2, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty() && (seq.starts_with(u8">"));
-        });
+        Name_Match_Result name = match_name_permissive<End_Tag_Name_Stop {}>(remainder);
 
         if (!name.length) {
             return true;
