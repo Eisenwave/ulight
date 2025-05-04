@@ -23,42 +23,8 @@ constexpr std::u8string_view comment_suffix = u8"-->";
 constexpr std::u8string_view illegal_comment_sequence = u8"--";
 constexpr std::u8string_view cdata_section_prefix = u8"<![CDATA[";
 constexpr std::u8string_view cdata_section_suffix = u8"]]>";
+constexpr std::u8string_view xml_decl_prefix = u8"<?xml";
 constexpr std::u8string_view tag_suffix = u8">";
-
-struct End_Tag_Name_Stop {
-
-    bool operator()(std::u8string_view str) const
-    {
-        return !str.empty() && (str.starts_with(tag_suffix));
-    }
-};
-
-struct Start_Tag_Name_Stop {
-
-    bool operator()(std::u8string_view str) const
-    {
-        return !str.empty()
-            && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix));
-    }
-};
-
-struct Processing_Instr_Name_Stop {
-
-    bool operator()(std::u8string_view str) const
-    {
-        return !str.empty() && (match_whitespace(str) || str.starts_with(u8"?>"));
-    }
-};
-
-struct Attribute_Name_Stop {
-
-    bool operator()(std::u8string_view str) const
-    {
-        return !str.empty()
-            && (match_whitespace(str) || str.starts_with(u8'=') || str.starts_with(u8'>')
-                || str.starts_with(u8"/>"));
-    }
-};
 
 [[nodiscard]]
 bool contains_xml_string(std::u8string_view str)
@@ -196,7 +162,9 @@ public:
         }
 
         emit_and_advance(2, Highlight_Type::sym_punc);
-        Name_Match_Result target = match_name_permissive<Processing_Instr_Name_Stop {}>(remainder);
+        Name_Match_Result target = match_name_permissive(remainder, [](std::u8string_view str) {
+            return !str.empty() && (match_whitespace(str) || str.starts_with(u8"?>"));
+        });
 
         if (!target.length) {
             return true;
@@ -270,7 +238,11 @@ public:
 
         emit_and_advance(1, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive<Start_Tag_Name_Stop {}>(remainder);
+        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view str) {
+            return !str.empty()
+                && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix)
+                );
+        });
 
         if (!name.length) {
             return true;
@@ -303,7 +275,11 @@ public:
 
     bool expect_attribute()
     {
-        Name_Match_Result name = match_name_permissive<Attribute_Name_Stop {}>(remainder);
+        Name_Match_Result name = match_name_permissive<>(remainder, [](std::u8string_view str) {
+            return !str.empty()
+                && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix)
+                    || str.starts_with(u8'='));
+        });
 
         highlight_name(name, Highlight_Type::markup_attr);
 
@@ -411,7 +387,9 @@ public:
 
         emit_and_advance(2, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive<End_Tag_Name_Stop {}>(remainder);
+        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view str) {
+            return !str.empty() && (match_whitespace(str) || str.starts_with(tag_suffix));
+        });
 
         if (!name.length) {
             return true;

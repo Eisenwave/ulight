@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <set>
 #include <string_view>
+#include <type_traits>
 
 #include "ulight/impl/lang/xml_chars.hpp"
 #include "ulight/impl/unicode_algorithm.hpp"
@@ -27,9 +28,9 @@ struct Name_Match_Result {
 /// beginning of str satisfies the predicate is_stop_sequence.
 /// Characters that are not allowed in a name e.g & and > are
 /// marked for later highlighting.
-template <auto is_stop>
+template <typename Stop>
 [[nodiscard]]
-Name_Match_Result match_name_permissive(const std::u8string_view str)
+Name_Match_Result match_name_permissive(const std::u8string_view str, Stop is_stop)
 {
     Name_Match_Result result {};
 
