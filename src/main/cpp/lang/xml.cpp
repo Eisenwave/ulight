@@ -23,7 +23,6 @@ constexpr std::u8string_view comment_suffix = u8"-->";
 constexpr std::u8string_view illegal_comment_sequence = u8"--";
 constexpr std::u8string_view cdata_section_prefix = u8"<![CDATA[";
 constexpr std::u8string_view cdata_section_suffix = u8"]]>";
-constexpr std::u8string_view xml_decl_prefix = u8"<?xml";
 constexpr std::u8string_view tag_suffix = u8">";
 
 [[nodiscard]]
