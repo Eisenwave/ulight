@@ -86,31 +86,36 @@ html::Match_Result match_comment(std::u8string_view str)
 struct XML_Highlighter : Highlighter_Base {
 
 private:
-    void highlight_name(const Name_Match_Result& result, Highlight_Type type)
+    template <typename Stop>
+    std::size_t expect_name(Highlight_Type type, Stop is_stop)
     {
-        std::size_t distance = 0;
-        for (std::size_t i = 0; i < result.length; i++) {
 
-            if (result.error_indicies.contains(i)) {
+        std::size_t total_length = 0;
+        std::size_t piece_length = 0;
 
-                if (distance) {
-                    emit_and_advance(distance, type);
+        while (piece_length < remainder.length() && !is_stop(remainder.substr(piece_length))) {
+            const auto [code_point, length]
+                = utf8::decode_and_length_or_throw(remainder.substr(piece_length));
+            if ((total_length == 0 && !is_xml_name_start(code_point)) || !is_xml_name(code_point)) {
+                if (piece_length) {
+                    emit_and_advance(piece_length, type);
                 }
+                emit_and_advance(1, Highlight_Type::error);
 
-                if (!remainder.empty()) {
-                    emit_and_advance(1, Highlight_Type::error);
-                }
-
-                distance = 0;
-                continue;
+                piece_length = 0;
+                total_length += 1;
             }
-
-            distance++;
+            else {
+                piece_length += std::size_t(length);
+                total_length += std::size_t(length);
+            }
         }
 
-        if (distance) {
-            emit_and_advance(distance, type);
+        if (piece_length) {
+            emit_and_advance(piece_length, type);
         }
+
+        return total_length;
     }
 
 public:
@@ -141,7 +146,10 @@ public:
         return true;
     }
 
-    bool expect_prolog()
+    friend
+
+        bool
+        expect_prolog()
     {
 
         return true;
@@ -161,21 +169,19 @@ public:
         }
 
         emit_and_advance(2, Highlight_Type::sym_punc);
-        Name_Match_Result target = match_name_permissive(remainder, [](std::u8string_view str) {
+        std::size_t length = expect_name(Highlight_Type::macro, [](std::u8string_view str) {
             return !str.empty() && (match_whitespace(str) || str.starts_with(u8"?>"));
         });
 
-        if (!target.length) {
+        if (!length) {
             return true;
         }
 
-        std::u8string_view target_name = remainder.substr(0, target.length);
+        std::u8string_view target_name = remainder.substr(0, length);
 
         if (contains_xml_string(target_name)) {
             return true;
         }
-
-        highlight_name(target, Highlight_Type::macro);
 
         advance(match_whitespace(remainder));
 
@@ -237,17 +243,16 @@ public:
 
         emit_and_advance(1, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view str) {
-            return !str.empty()
-                && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix)
-                );
-        });
+        std::size_t name_length
+            = expect_name(Highlight_Type::markup_tag, [](std::u8string_view str) {
+                  return !str.empty()
+                      && (match_whitespace(str) || str.starts_with(u8"/>")
+                          || str.starts_with(tag_suffix));
+              });
 
-        if (!name.length) {
+        if (!name_length) {
             return true;
         }
-
-        highlight_name(name, Highlight_Type::markup_tag);
 
         while (!remainder.empty()) {
 
@@ -274,13 +279,11 @@ public:
 
     bool expect_attribute()
     {
-        Name_Match_Result name = match_name_permissive<>(remainder, [](std::u8string_view str) {
+        expect_name(Highlight_Type::markup_attr, [](std::u8string_view str) {
             return !str.empty()
                 && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix)
                     || str.starts_with(u8'='));
         });
-
-        highlight_name(name, Highlight_Type::markup_attr);
 
         advance(match_whitespace(remainder));
 
@@ -386,16 +389,14 @@ public:
 
         emit_and_advance(2, Highlight_Type::sym_punc);
 
-        // TODO: add match whitespace back (unrelated to current PR)
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view str) {
-            return !str.empty() && (str.starts_with(tag_suffix));
-        });
+        std::size_t name_length
+            = expect_name(Highlight_Type::markup_tag, [](std::u8string_view str) {
+                  return !str.empty() && (match_whitespace(str) || str.starts_with(tag_suffix));
+              });
 
-        if (!name.length) {
+        if (!name_length) {
             return true;
         }
-
-        emit_and_advance(name.length, Highlight_Type::markup_tag);
 
         advance(match_whitespace(remainder));
 
