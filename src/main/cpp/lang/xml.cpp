@@ -386,8 +386,9 @@ public:
 
         emit_and_advance(2, Highlight_Type::sym_punc);
 
+        // TODO: add match whitespace back (unrelated to current PR)
         Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view str) {
-            return !str.empty() && (match_whitespace(str) || str.starts_with(tag_suffix));
+            return !str.empty() && (str.starts_with(tag_suffix));
         });
 
         if (!name.length) {
