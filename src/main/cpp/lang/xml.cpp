@@ -87,6 +87,7 @@ struct XML_Highlighter : Highlighter_Base {
 
 private:
     template <typename Stop>
+        requires std::is_invocable_r_v<bool, Stop, std::u8string_view>
     std::size_t expect_name(Highlight_Type type, Stop is_stop)
     {
 
