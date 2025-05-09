@@ -2,8 +2,6 @@
 #define ULIGHT_XML_HPP
 
 #include <cstddef>
-#include <functional>
-#include <set>
 #include <string_view>
 
 #include "html.hpp"
@@ -15,21 +13,6 @@ namespace ulight::xml {
 /// is not whitespace 0 is returned
 [[nodiscard]]
 std::size_t match_whitespace(std::u8string_view str);
-
-struct Name_Match_Result {
-    std::size_t length = 0;
-    std::set<std::size_t> error_indicies;
-};
-
-/// @brief matches a name at the beginning of str until the
-/// beginning of str satisfies the predicate is_stop_sequence.
-/// Characters that are not allowed in a name e.g & and > are
-/// marked for later highlighting.
-[[nodiscard]]
-Name_Match_Result match_name_permissive(
-    std::u8string_view str,
-    const std::function<bool(std::u8string_view)>& is_stop_sequence
-);
 
 /// @brief matches a comment at the start of str
 /// according to the XML standard

@@ -11,7 +11,6 @@
 #include "ulight/ulight.hpp"
 
 #include <cctype>
-#include <functional>
 
 namespace ulight {
 
@@ -24,6 +23,7 @@ constexpr std::u8string_view comment_suffix = u8"-->";
 constexpr std::u8string_view illegal_comment_sequence = u8"--";
 constexpr std::u8string_view cdata_section_prefix = u8"<![CDATA[";
 constexpr std::u8string_view cdata_section_suffix = u8"]]>";
+constexpr std::u8string_view tag_suffix = u8">";
 
 [[nodiscard]]
 bool contains_xml_string(std::u8string_view str)
@@ -46,26 +46,6 @@ bool contains_xml_string(std::u8string_view str)
 std::size_t match_whitespace(std::u8string_view str)
 {
     return ascii::length_if(str, [](char8_t c) { return is_xml_whitespace(c); });
-}
-
-[[nodiscard]]
-Name_Match_Result match_name_permissive(
-    const std::u8string_view str,
-    const std::function<bool(std::u8string_view)>& is_stop_sequence
-)
-{
-    Name_Match_Result result {};
-
-    while (result.length < str.length() && !is_stop_sequence(str.substr(result.length))) {
-        const auto [code_point, length]
-            = utf8::decode_and_length_or_throw(str.substr(result.length));
-        if ((result.length == 0 && !is_xml_name_start(code_point)) || !is_xml_name(code_point)) {
-            result.error_indicies.insert(result.length);
-        }
-        result.length += std::size_t(length);
-    }
-
-    return result;
 }
 
 [[nodiscard]]
@@ -106,31 +86,37 @@ html::Match_Result match_comment(std::u8string_view str)
 struct XML_Highlighter : Highlighter_Base {
 
 private:
-    void highlight_name(const Name_Match_Result& result, Highlight_Type type)
+    template <typename Stop>
+        requires std::is_invocable_r_v<bool, Stop, std::u8string_view>
+    std::size_t expect_name(Highlight_Type type, Stop is_stop)
     {
-        std::size_t distance = 0;
-        for (std::size_t i = 0; i < result.length; i++) {
 
-            if (result.error_indicies.contains(i)) {
+        std::size_t total_length = 0;
+        std::size_t piece_length = 0;
 
-                if (distance) {
-                    emit_and_advance(distance, type);
+        while (piece_length < remainder.length() && !is_stop(remainder.substr(piece_length))) {
+            const auto [code_point, length]
+                = utf8::decode_and_length_or_throw(remainder.substr(piece_length));
+            if ((total_length == 0 && !is_xml_name_start(code_point)) || !is_xml_name(code_point)) {
+                if (piece_length) {
+                    emit_and_advance(piece_length, type);
                 }
+                emit_and_advance(1, Highlight_Type::error);
 
-                if (!remainder.empty()) {
-                    emit_and_advance(1, Highlight_Type::error);
-                }
-
-                distance = 0;
-                continue;
+                piece_length = 0;
+                total_length += 1;
             }
-
-            distance++;
+            else {
+                piece_length += std::size_t(length);
+                total_length += std::size_t(length);
+            }
         }
 
-        if (distance) {
-            emit_and_advance(distance, type);
+        if (piece_length) {
+            emit_and_advance(piece_length, type);
         }
+
+        return total_length;
     }
 
 public:
@@ -161,7 +147,10 @@ public:
         return true;
     }
 
-    bool expect_prolog()
+    friend
+
+        bool
+        expect_prolog()
     {
 
         return true;
@@ -181,21 +170,19 @@ public:
         }
 
         emit_and_advance(2, Highlight_Type::sym_punc);
-        Name_Match_Result target = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty() && (match_whitespace(seq) || seq.starts_with(u8"?>"));
+        std::size_t length = expect_name(Highlight_Type::macro, [](std::u8string_view str) {
+            return !str.empty() && (match_whitespace(str) || str.starts_with(u8"?>"));
         });
 
-        if (!target.length) {
+        if (!length) {
             return true;
         }
 
-        std::u8string_view target_name = remainder.substr(0, target.length);
+        std::u8string_view target_name = remainder.substr(0, length);
 
         if (contains_xml_string(target_name)) {
             return true;
         }
-
-        highlight_name(target, Highlight_Type::macro);
 
         advance(match_whitespace(remainder));
 
@@ -257,16 +244,16 @@ public:
 
         emit_and_advance(1, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty()
-                && (match_whitespace(seq) || seq.starts_with(u8"/>") || seq.starts_with(u8">"));
-        });
+        std::size_t name_length
+            = expect_name(Highlight_Type::markup_tag, [](std::u8string_view str) {
+                  return !str.empty()
+                      && (match_whitespace(str) || str.starts_with(u8"/>")
+                          || str.starts_with(tag_suffix));
+              });
 
-        if (!name.length) {
+        if (!name_length) {
             return true;
         }
-
-        highlight_name(name, Highlight_Type::markup_tag);
 
         while (!remainder.empty()) {
 
@@ -293,13 +280,11 @@ public:
 
     bool expect_attribute()
     {
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty()
-                && (match_whitespace(seq) || seq.starts_with(u8'=') || seq.starts_with(u8'>')
-                    || seq.starts_with(u8"/>"));
+        expect_name(Highlight_Type::markup_attr, [](std::u8string_view str) {
+            return !str.empty()
+                && (match_whitespace(str) || str.starts_with(u8"/>") || str.starts_with(tag_suffix)
+                    || str.starts_with(u8'='));
         });
-
-        highlight_name(name, Highlight_Type::markup_attr);
 
         advance(match_whitespace(remainder));
 
@@ -405,15 +390,14 @@ public:
 
         emit_and_advance(2, Highlight_Type::sym_punc);
 
-        Name_Match_Result name = match_name_permissive(remainder, [](std::u8string_view seq) {
-            return !seq.empty() && (seq.starts_with(u8">"));
-        });
+        std::size_t name_length
+            = expect_name(Highlight_Type::markup_tag, [](std::u8string_view str) {
+                  return !str.empty() && (match_whitespace(str) || str.starts_with(tag_suffix));
+              });
 
-        if (!name.length) {
+        if (!name_length) {
             return true;
         }
-
-        emit_and_advance(name.length, Highlight_Type::markup_tag);
 
         advance(match_whitespace(remainder));
 
