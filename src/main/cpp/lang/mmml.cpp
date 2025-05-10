@@ -2,6 +2,7 @@
 #include <expected>
 #include <memory_resource>
 #include <string_view>
+#include <vector>
 
 #include "ulight/ulight.hpp"
 
@@ -111,8 +112,8 @@ bool is_terminated_by(Content_Context context, char8_t c)
 }
 
 struct Consumer {
-    virtual void whitespace(std::size_t length) = 0;
     virtual void text(std::size_t length) = 0;
+    virtual void whitespace_in_arguments(std::size_t length) = 0;
     virtual void opening_square() = 0;
     virtual void closing_square() = 0;
     virtual void comma() = 0;
@@ -211,11 +212,11 @@ std::size_t match_argument(Consumer& out, std::u8string_view str)
     Named_Argument_Result name = match_named_argument_prefix(str);
     if (name) {
         if (name.leading_whitespace) {
-            out.whitespace(name.leading_whitespace);
+            out.whitespace_in_arguments(name.leading_whitespace);
         }
         out.argument_name(name.name_length);
         if (name.trailing_whitespace) {
-            out.whitespace(name.trailing_whitespace);
+            out.whitespace_in_arguments(name.trailing_whitespace);
         }
         out.equals();
     }
@@ -318,10 +319,11 @@ struct [[nodiscard]] Highlighter : Highlighter_Base {
 
     struct Dispatch_Consumer;
     struct Normal_Consumer;
+    struct Code_Block_Consumer;
     struct Comment_Consumer;
 };
 
-struct Highlighter::Normal_Consumer final : Consumer {
+struct Highlighter::Normal_Consumer : Consumer {
     Highlighter& self;
 
     Normal_Consumer(Highlighter& self)
@@ -329,51 +331,158 @@ struct Highlighter::Normal_Consumer final : Consumer {
     {
     }
 
-    void whitespace(std::size_t w) final
+    void whitespace_in_arguments(std::size_t w) override
     {
         self.advance(w);
     }
-    void text(std::size_t t) final
+    void text(std::size_t t) override
     {
         self.advance(t);
     }
-    void opening_square() final
+    void opening_square() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_square);
     }
-    void closing_square() final
+    void closing_square() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_square);
     }
-    void comma() final
+    void comma() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_punc);
     }
-    void argument_name(std::size_t a) final
+    void argument_name(std::size_t a) override
     {
         self.emit_and_advance(a, Highlight_Type::markup_attr);
     }
-    void equals() final
+    void equals() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_punc);
     }
-    void directive_name(std::size_t d) final
+    void directive_name(std::size_t d) override
     {
         self.emit_and_advance(d, Highlight_Type::markup_tag);
     }
-    void opening_brace() final
+    void opening_brace() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_brace);
     }
-    void closing_brace() final
+    void closing_brace() override
     {
         self.emit_and_advance(1, Highlight_Type::sym_brace);
     }
-    void escape() final
+    void escape() override
     {
         self.emit_and_advance(2, Highlight_Type::escape);
     }
-    void unexpected_eof() final { }
+};
+
+struct Highlighter::Code_Block_Consumer : Normal_Consumer {
+private:
+    std::pmr::memory_resource* memory;
+    std::pmr::vector<char8_t> nested_source { memory };
+    std::pmr::vector<std::size_t> nested_remap { memory };
+
+    std::size_t arguments_level = 0;
+    std::size_t brace_level = 0;
+
+    enum struct State : Underlying {
+        before_block,
+        in_block,
+        done
+    } state = State::before_block;
+
+public:
+    Code_Block_Consumer(Highlighter& self, std::pmr::memory_resource* memory)
+        : Normal_Consumer { self }
+        , memory { memory }
+    {
+    }
+
+    [[nodiscard]]
+    bool done() const
+    {
+        return state == State::done;
+    }
+
+    void text(std::size_t t) override
+    {
+        if (arguments_level != 0 || brace_level > 1) {
+            Normal_Consumer::text(t);
+        }
+        else {
+            ULIGHT_ASSERT(brace_level == 1);
+            const std::u8string_view code_snippet = self.remainder.substr(0, t);
+            nested_source.insert_range(nested_source.end(), code_snippet);
+
+            const std::size_t remap_base = nested_remap.empty() ? 0 : nested_remap.back() + 1;
+            nested_remap.insert_range(
+                nested_remap.end(), std::views::iota(remap_base, remap_base + t)
+            );
+        }
+    }
+    void whitespace_in_arguments(std::size_t w) override
+    {
+        Normal_Consumer::whitespace_in_arguments(w);
+    }
+    void opening_square() override
+    {
+        Normal_Consumer::opening_square();
+    }
+    void closing_square() override
+    {
+        Normal_Consumer::closing_brace();
+    }
+    void comma() override
+    {
+        Normal_Consumer::comma();
+    }
+    void argument_name(std::size_t a) override
+    {
+        Normal_Consumer::argument_name(a);
+    }
+    void equals() override
+    {
+        Normal_Consumer::equals();
+    }
+    void directive_name(std::size_t d) override
+    {
+        Normal_Consumer::directive_name(d);
+    }
+    void opening_brace() final
+    {
+        Normal_Consumer::opening_brace();
+        if (arguments_level == 0 && brace_level == 0) {
+            ULIGHT_ASSERT(state == State::before_block);
+            state = State::in_block;
+        }
+        ++brace_level;
+    }
+    void closing_brace() final
+    {
+        Normal_Consumer::closing_brace();
+        --brace_level;
+        if (arguments_level == 0 && brace_level == 0) {
+            state = State::done;
+        }
+    }
+    void escape() override
+    {
+        Normal_Consumer::escape();
+    }
+
+    void push_arguments() final
+    {
+        ++arguments_level;
+    }
+    void pop_arguments() final
+    {
+        --arguments_level;
+    }
+    void unexpected_eof() final
+    {
+        state = State::done;
+    }
 };
 
 struct Highlighter::Comment_Consumer final : Consumer {
@@ -409,7 +518,7 @@ public:
         return active_length == &suffix;
     }
 
-    void whitespace(std::size_t w) final
+    void whitespace_in_arguments(std::size_t w) final
     {
         *active_length += w;
     }
@@ -462,6 +571,7 @@ public:
     {
         *active_length += 1;
     }
+
     void push_arguments() final
     {
         ++arguments_level;
@@ -487,10 +597,10 @@ struct Highlighter::Dispatch_Consumer final : Consumer {
     {
     }
 
-    void whitespace(std::size_t w) final
+    void whitespace_in_arguments(std::size_t w) final
     {
         ULIGHT_DEBUG_ASSERT(w != 0);
-        current->whitespace(w);
+        current->whitespace_in_arguments(w);
     }
     void text(std::size_t t) final
     {
